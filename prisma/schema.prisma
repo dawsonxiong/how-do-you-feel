@@ -1,0 +1,23 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model MoodEntry {
+  id        String   @id @default(cuid())
+  rating    Float    // 0-10 scale
+  date      DateTime // Date of the entry (without time for daily grouping)
+  tags      String?  // Optional comma-separated tags
+  notes     String?  // Optional notes
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("mood_entries")
+}
