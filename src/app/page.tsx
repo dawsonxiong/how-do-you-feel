@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { MoodChart } from "@/components/MoodChart"
 import { MoodEntryForm } from "@/components/MoodEntryForm"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function Home() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
@@ -27,8 +28,16 @@ export default function Home() {
           </div>
         </div>
         {/* Footer */}
-        <footer className="lg:mt-72 mt-8 text-center text-muted-foreground">
-          <p className="text-sm">for j</p>
+        <footer className="mt-8 text-muted-foreground">
+          <div className="flex items-center justify-between w-full mx-auto">
+            <div>
+              <ThemeToggle />
+            </div>
+            <div className="flex-1 flex justify-center">
+              <p className="text-sm text-center">for j</p>
+            </div>
+            <div className="w-8" />
+          </div>
         </footer>
       </div>
     </div>
