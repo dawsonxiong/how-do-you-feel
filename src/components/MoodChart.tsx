@@ -64,7 +64,7 @@ const CustomTooltip = ({
         {/* Show details for multiple entries */}
         {hasMultipleEntries ? (
           <div className="mt-2 space-y-1">
-            {data.entries.map((entry, index) => (
+            {data.entries.map((entry) => (
               <div key={entry.id} className="text-xs border-l-2 border-muted pl-2">
                 <span className="font-medium text-primary">{entry.rating}</span>
                 {entry.tags && (
@@ -229,22 +229,16 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
               <CartesianGrid 
                 strokeDasharray="3 3" 
                 className="opacity-30"
-                animationBegin={200}
-                animationDuration={800}
               />
               <XAxis 
                 dataKey="date" 
                 tickFormatter={formatXAxisLabel} 
                 className="text-xs"
-                animationBegin={400}
-                animationDuration={600}
               />
               <YAxis 
                 domain={[0, 10]} 
                 ticks={[0, 2, 4, 6, 8, 10]} 
                 className="text-xs"
-                animationBegin={400}
-                animationDuration={600}
               />
               <Tooltip content={<CustomTooltip />} />
                 <Line
