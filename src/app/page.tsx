@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { MoodChart } from "@/components/mood-chart"
-import { MoodEntryForm } from "@/components/mood-entry-form"
+import { MoodChart } from "@/components/MoodChart"
+import { MoodEntryForm } from "@/components/MoodEntryForm"
 
 export default function Home() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
