@@ -18,6 +18,7 @@ interface MoodData {
   date: string
   rating: number
   entryCount: number
+  hasData: boolean
   entries: Array<{
     id: string
     rating: number
@@ -47,6 +48,9 @@ const CustomTooltip = ({
 }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
+    
+    // All data points should have data now
+    
     const hasMultipleEntries = data.entryCount > 1
 
     return (
@@ -120,10 +124,33 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   const formatXAxisLabel = (tickItem: string) => {
     try {
       const date = parseISO(tickItem)
-      return format(date, "MMM dd")
+      const now = new Date()
+      const daysDiff = Math.abs((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+      
+      // Adaptive formatting based on recency
+      if (daysDiff < 7) {
+        return format(date, "EEE") // "Mon", "Tue"
+      } 
+      if (daysDiff < 30) {
+        return format(date, "MMM dd") // "Sep 15"
+      }
+      return format(date, "MMM dd") // Keep consistent for 30-day view
     } catch {
       return tickItem
     }
+  }
+
+  const getTickInterval = () => {
+    if (data.length <= 7) {
+      return 0 // Show all days
+    } 
+    if (data.length <= 30) {
+      return 2 // Show every 3rd day  
+    }
+    if (data.length <= 60) {
+      return 4 // Show every 5th day
+    }
+    return 6 // Show every 7th day for longer periods
   }
 
   const getAverageRating = () => {
@@ -134,9 +161,10 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   }
 
   const getRecentTrend = () => {
-    if (data.length < 2) return null
-    const recent = data.slice(-7) // Last 7 entries
-    if (recent.length < 2) return null
+    if (data.length < 4) return null
+    
+    const recent = data.slice(-10) // Last 10 entries
+    if (recent.length < 4) return null
 
     const firstHalf = recent.slice(0, Math.floor(recent.length / 2))
     const secondHalf = recent.slice(Math.floor(recent.length / 2))
@@ -209,7 +237,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                   : trend === "declining"
                     ? "text-red-600"
                     : "text-blue-600"
-              }`}
+              }`} 
             >
               recent trend: {trend}
             </span>
@@ -232,8 +260,10 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
               />
               <XAxis 
                 dataKey="date" 
-                tickFormatter={formatXAxisLabel} 
+                type="category"
+                tickFormatter={formatXAxisLabel}
                 className="text-xs"
+                interval={getTickInterval()}
               />
               <YAxis 
                 domain={[0, 10]} 
@@ -257,6 +287,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                   animationBegin={0}
                   animationDuration={1500}
                   animationEasing="ease-out"
+                  isAnimationActive={true}
                 />
             </LineChart>
           </ResponsiveContainer>

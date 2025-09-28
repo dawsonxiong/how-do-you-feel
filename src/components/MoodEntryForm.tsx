@@ -85,8 +85,8 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
           <div className="space-y-4">
             <div className="text-center mb-6">
               <div className="text-base">
-                <span className="text-xl font-bold text-primary">{rating[0]}</span>
-                <span className="text-muted-foreground">/10</span>
+                <span className="text-primary">{rating[0]}</span>
+                <span>/10</span>
                 <span className="mx-2 text-muted-foreground">–</span>
                 <span>{moodLabels[rating[0] as keyof typeof moodLabels]}</span>
               </div>

@@ -43,8 +43,22 @@ export async function GET() {
     })
 
     // Group by date and calculate daily averages
+    interface DayData {
+      date: string
+      ratings: number[]
+      entries: Array<{
+        id: string
+        rating: number
+        date: Date
+        tags: string | null
+        notes: string | null
+        createdAt: Date
+        updatedAt: Date
+      }>
+    }
+
     const dailyAverages = moodEntries.reduce(
-      (acc, entry) => {
+      (acc: Record<string, DayData>, entry: typeof moodEntries[0]) => {
         const dateKey = format(entry.date, "yyyy-MM-dd")
 
         if (!acc[dateKey]) {
@@ -60,34 +74,56 @@ export async function GET() {
 
         return acc
       },
-      {} as Record<
-        string,
-        {
-          date: string
-          ratings: number[]
-          entries: Array<{
-            id: string
-            rating: number
-            date: Date
-            tags: string | null
-            notes: string | null
-            createdAt: Date
-            updatedAt: Date
-          }>
-        }
-      >
+      {} as Record<string, DayData>
     )
 
-    // Calculate averages and format for chart
-    const chartData = Object.values(dailyAverages).map((day) => ({
+    // Calculate averages for days with data
+    const dayData = (Object.values(dailyAverages) as DayData[]).map((day) => ({
       date: day.date,
       rating:
-        Math.round((day.ratings.reduce((sum, r) => sum + r, 0) / day.ratings.length) * 100) / 100,
+        Math.round((day.ratings.reduce((sum: number, r: number) => sum + r, 0) / day.ratings.length) * 100) / 100,
       entryCount: day.entries.length,
       entries: day.entries,
     }))
 
-    return NextResponse.json(chartData)
+    // Create continuous time series based on actual data range
+    let startDate: Date
+    let endDate: Date
+    
+    if (dayData.length > 0) {
+      // Use actual data range with some padding
+      const dates = dayData.map(d => new Date(d.date)).sort((a, b) => a.getTime() - b.getTime())
+      startDate = new Date(dates[0])
+      endDate = new Date(dates[dates.length - 1])
+      
+      // Add padding: 7 days before first entry, 3 days after last entry
+      startDate.setDate(startDate.getDate() - 7)
+      endDate.setDate(endDate.getDate() + 3)
+      
+      // But limit maximum range to 90 days to avoid chart performance issues
+      const maxDays = 90
+      const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+      
+      if (daysDiff > maxDays) {
+        // Show last 90 days of the data range
+        startDate = new Date(endDate)
+        startDate.setDate(endDate.getDate() - maxDays)
+      }
+    } else {
+      // Fallback to last 30 days if no data
+      endDate = new Date()
+      startDate = new Date()
+      startDate.setDate(endDate.getDate() - 30)
+    }
+    
+    // For now, just return the actual data points (no gaps)
+    // This avoids chart rendering issues with null values
+    const sortedData = dayData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    
+    return NextResponse.json(sortedData.map(item => ({
+      ...item,
+      hasData: true
+    })))
   } catch (error) {
     console.error("Error fetching mood entries:", error)
     return NextResponse.json({ error: "Failed to fetch mood entries" }, { status: 500 })
