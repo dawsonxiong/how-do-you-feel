@@ -85,7 +85,6 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
 
   useEffect(() => {
     fetchMoodData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger])
 
   const formatXAxisLabel = (tickItem: string) => {
