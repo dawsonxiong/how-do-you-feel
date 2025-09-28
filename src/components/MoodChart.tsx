@@ -2,6 +2,7 @@
 
 import { format, parseISO } from "date-fns"
 import { Calendar, TrendingUp } from "lucide-react"
+import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import {
   CartesianGrid,
@@ -103,6 +104,10 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   const [data, setData] = useState<MoodData[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+  const { theme } = useTheme()
+
+  // Get line color based on theme
+  const lineColor = theme === "dark" ? "#ffffff" : "#000000"
 
   const fetchMoodData = async () => {
     try {
@@ -252,18 +257,22 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
           <span>average: {averageRating}/10</span>
           {trend && (
-            <span
-              className={`font-medium ${
-                trend === "improving"
-                  ? "text-green-600"
-                  : trend === "declining"
-                    ? "text-red-600"
-                    : "text-blue-600"
-              }`}
-            >
-              recent trend: {trend}
-            </span>
+            <>
+              <span>|</span>
+              <span
+                className={`font-medium ${
+                  trend === "improving"
+                    ? "text-green-600"
+                    : trend === "declining"
+                      ? "text-red-600"
+                      : "text-blue-600"
+                }`}
+              >
+                recent trend: {trend}
+              </span>
+            </>
           )}
+          <span>|</span>
           <span>
             {data.length} {data.length === 1 ? "day" : "days"} tracked
           </span>
@@ -311,14 +320,14 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
               <Line
                 type="linear"
                 dataKey="rating"
-                stroke="#000000"
+                stroke={lineColor}
                 strokeWidth={2}
-                dot={{ fill: "#000000", strokeWidth: 1, r: 3 }}
+                dot={{ fill: lineColor, strokeWidth: 1, r: 3 }}
                 activeDot={{
                   r: 4,
-                  stroke: "#000000",
+                  stroke: lineColor,
                   strokeWidth: 2,
-                  fill: "#000000",
+                  fill: lineColor,
                   style: { pointerEvents: "none" },
                 }}
                 connectNulls={false}
