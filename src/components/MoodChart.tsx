@@ -202,7 +202,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
 
   if (isLoading) {
     return (
-      <Card className="w-full">
+      <Card className="w-full h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <TrendingUp className="w-5 h-5" />
@@ -220,7 +220,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
 
   if (data.length === 0) {
     return (
-      <Card className="w-full">
+      <Card className="w-full h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <TrendingUp className="w-5 h-5" />
@@ -243,7 +243,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   const averageRating = getAverageRating()
 
   return (
-    <Card className="w-full">
+    <Card className="w-full h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl">
           <TrendingUp className="w-5 h-5" />

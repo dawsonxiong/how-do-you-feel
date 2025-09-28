@@ -16,7 +16,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <div className="container mx-auto px-6 py-8 max-w-5xl">
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start lg:mt-32 mt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch lg:mt-32 mt-4">
           {/* Mood Entry Form */}
           <div className="order-1 lg:order-1">
             <MoodEntryForm onSuccess={handleMoodEntrySuccess} />

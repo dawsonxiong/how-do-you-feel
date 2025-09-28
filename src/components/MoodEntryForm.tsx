@@ -73,7 +73,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto gap-2 h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-center text-xl">
           <Heart className="w-5 h-5" />
@@ -83,7 +83,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <div className="text-center mb-4">
+            <div className="text-center">
               <div className="text-base">
                 <span className="text-primary">{rating[0]}</span>
                 <span>/10</span>
