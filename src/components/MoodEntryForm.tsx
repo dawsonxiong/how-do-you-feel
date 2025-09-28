@@ -12,17 +12,17 @@ interface MoodEntryFormProps {
 }
 
 const moodLabels = {
-  0: "Terrible",
-  1: "Very Sad",
-  2: "Sad",
-  3: "Down",
-  4: "Low",
-  5: "Neutral",
-  6: "Okay",
-  7: "Good",
-  8: "Happy",
-  9: "Great",
-  10: "Amazing!",
+  0: "terrible :(",
+  1: "very sad",
+  2: "sad",
+  3: "down",
+  4: "low",
+  5: "neutral",
+  6: "okay",
+  7: "good",
+  8: "happy",
+  9: "great",
+  10: "amazing!",
 }
 
 export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
@@ -70,7 +70,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-center text-xl">
           <Heart className="w-5 h-5" />
-          How are you feeling?
+          how are u feeling?
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -104,7 +104,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
           <div className="space-y-4">
             <div>
               <label htmlFor="tags" className="block text-sm font-medium mb-2 text-muted-foreground">
-                Tags <span className="text-xs font-normal">(optional)</span>
+                tags <span className="text-xs font-normal"/>
               </label>
               <Input
                 id="tags"
@@ -117,12 +117,12 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
 
             <div>
               <label htmlFor="notes" className="block text-sm font-medium mb-2 text-muted-foreground">
-                Notes <span className="text-xs font-normal">(optional)</span>
+                notes <span className="text-xs font-normal"/>
               </label>
               <Input
                 id="notes"
                 type="text"
-                placeholder="What's affecting your mood today?"
+                placeholder="what's affecting your mood today?"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />

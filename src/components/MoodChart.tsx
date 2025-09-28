@@ -48,7 +48,7 @@ const CustomTooltip = ({
   if (active && payload && payload.length) {
     const data = payload[0].payload
     const hasMultipleEntries = data.entryCount > 1
-    
+
     return (
       <div className="bg-background border rounded-lg p-3 shadow-md max-w-xs">
         <p className="font-medium text-sm">{format(parseISO(label || ""), "MMM dd, yyyy")}</p>
@@ -60,7 +60,7 @@ const CustomTooltip = ({
             ({data.entryCount} {data.entryCount === 1 ? "entry" : "entries"})
           </span>
         </p>
-        
+
         {/* Show details for multiple entries */}
         {hasMultipleEntries ? (
           <div className="mt-2 space-y-1">
@@ -68,11 +68,11 @@ const CustomTooltip = ({
               <div key={entry.id} className="text-xs border-l-2 border-muted pl-2">
                 <span className="font-medium text-primary">{entry.rating}</span>
                 {entry.tags && (
-                  <span className="text-muted-foreground ml-2">#{entry.tags.replace(/,/g, ' #')}</span>
+                  <span className="text-muted-foreground ml-2">
+                    #{entry.tags.replace(/,/g, " #")}
+                  </span>
                 )}
-                {entry.notes && (
-                  <p className="text-muted-foreground mt-0.5">"{entry.notes}"</p>
-                )}
+                {entry.notes && <p className="text-muted-foreground mt-0.5">"{entry.notes}"</p>}
               </div>
             ))}
           </div>
@@ -81,7 +81,7 @@ const CustomTooltip = ({
           <div className="mt-2">
             {data.entries[0]?.tags && (
               <p className="text-xs text-muted-foreground">
-                #{data.entries[0].tags.replace(/,/g, ' #')}
+                #{data.entries[0].tags.replace(/,/g, " #")}
               </p>
             )}
             {data.entries[0]?.notes && (
@@ -156,12 +156,12 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <TrendingUp className="w-5 h-5" />
-            Your Mood Journey
+            history
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-64 flex items-center justify-center">
-            <div className="text-muted-foreground">Loading your mood data...</div>
+            <div className="text-muted-foreground">loading...</div>
           </div>
         </CardContent>
       </Card>
@@ -174,14 +174,14 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <TrendingUp className="w-5 h-5" />
-            Your Mood Journey
+            history
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-64 flex flex-col items-center justify-center text-center">
             <Calendar className="w-12 h-12 text-muted-foreground mb-4" />
             <div className="text-muted-foreground">
-              No mood entries yet. Add your first entry above to start tracking your mood journey!
+              no mood entries yet. add your first entry above to start tracking
             </div>
           </div>
         </CardContent>
@@ -197,10 +197,10 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl">
           <TrendingUp className="w-5 h-5" />
-          Your Mood Journey
+          history
         </CardTitle>
         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-          <span>Average: {averageRating}/10</span>
+          <span>average: {averageRating}/10</span>
           {trend && (
             <span
               className={`font-medium ${
@@ -211,7 +211,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                     : "text-blue-600"
               }`}
             >
-              Recent trend: {trend}
+              recent trend: {trend}
             </span>
           )}
           <span>
@@ -225,19 +225,21 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis dataKey="date" tickFormatter={formatXAxisLabel} className="text-xs" />
-              <YAxis domain={[0, 10]} className="text-xs" />
+              <YAxis domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} className="text-xs" />
               <Tooltip content={<CustomTooltip />} />
               <Line
-                type="monotone"
+                type="linear"
                 dataKey="rating"
-                stroke="hsl(var(--primary))"
-                strokeWidth={3}
-                dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 5 }}
+                stroke="#000000"
+                strokeWidth={2}
+                dot={{ fill: "#000000", strokeWidth: 1, r: 3 }}
                 activeDot={{
-                  r: 6,
-                  stroke: "hsl(var(--primary))",
+                  r: 4,
+                  stroke: "#000000",
                   strokeWidth: 2,
+                  fill: "#000000",
                 }}
+                connectNulls={false}
               />
             </LineChart>
           </ResponsiveContainer>

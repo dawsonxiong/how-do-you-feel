@@ -15,7 +15,7 @@ const jetBrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "How Do You Feel?",
+  title: "how do u feel?",
   description: "Track your daily mood and emotions. Discover patterns in your mental wellbeing with beautiful visualizations.",
 }
 
