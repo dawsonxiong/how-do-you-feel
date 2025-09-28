@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart } from "lucide-react"
+import { Heart, Check } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -30,6 +30,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
   const [tags, setTags] = useState("")
   const [notes, setNotes] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,11 +50,17 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
       })
 
       if (response.ok) {
-        // Reset form
-        setRating([5])
-        setTags("")
-        setNotes("")
-        onSuccess?.()
+        // Show success animation
+        setIsSuccess(true)
+        
+        // Reset form after animation
+        setTimeout(() => {
+          setRating([5])
+          setTags("")
+          setNotes("")
+          setIsSuccess(false)
+          onSuccess?.()
+        }, 1200)
       } else {
         throw new Error("Failed to save mood entry")
       }
@@ -129,8 +136,23 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "saving..." : "save"}
+          <Button 
+            type="submit" 
+            className={`w-full transition-all duration-300 ${isSuccess ? "bg-green-500 hover:bg-green-500" : ""}`}
+            disabled={isSubmitting || isSuccess}
+          >
+            <div className="flex items-center justify-center gap-2">
+              {isSuccess ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span className="animate-pulse">saved!</span>
+                </>
+              ) : isSubmitting ? (
+                <span className="animate-pulse">saving...</span>
+              ) : (
+                "save"
+              )}
+            </div>
           </Button>
         </form>
       </CardContent>

@@ -222,25 +222,48 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
       <CardContent>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis dataKey="date" tickFormatter={formatXAxisLabel} className="text-xs" />
-              <YAxis domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} className="text-xs" />
-              <Tooltip content={<CustomTooltip />} />
-              <Line
-                type="linear"
-                dataKey="rating"
-                stroke="#000000"
-                strokeWidth={2}
-                dot={{ fill: "#000000", strokeWidth: 1, r: 3 }}
-                activeDot={{
-                  r: 4,
-                  stroke: "#000000",
-                  strokeWidth: 2,
-                  fill: "#000000",
-                }}
-                connectNulls={false}
+            <LineChart 
+              data={data}
+              margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+            >
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                className="opacity-30"
+                animationBegin={200}
+                animationDuration={800}
               />
+              <XAxis 
+                dataKey="date" 
+                tickFormatter={formatXAxisLabel} 
+                className="text-xs"
+                animationBegin={400}
+                animationDuration={600}
+              />
+              <YAxis 
+                domain={[0, 10]} 
+                ticks={[0, 2, 4, 6, 8, 10]} 
+                className="text-xs"
+                animationBegin={400}
+                animationDuration={600}
+              />
+              <Tooltip content={<CustomTooltip />} />
+                <Line
+                  type="linear"
+                  dataKey="rating"
+                  stroke="#000000"
+                  strokeWidth={2}
+                  dot={{ fill: "#000000", strokeWidth: 1, r: 3 }}
+                  activeDot={{
+                    r: 4,
+                    stroke: "#000000",
+                    strokeWidth: 2,
+                    fill: "#000000",
+                  }}
+                  connectNulls={false}
+                  animationBegin={0}
+                  animationDuration={1500}
+                  animationEasing="ease-out"
+                />
             </LineChart>
           </ResponsiveContainer>
         </div>
