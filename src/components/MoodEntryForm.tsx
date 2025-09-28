@@ -112,9 +112,9 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
             <div>
               <label
                 htmlFor="tags"
-                className="block text-sm font-medium mb-2 text-muted-foreground"
+                className="block text-sm font-medium mb-2 text-gray-600 dark:text-gray-300"
               >
-                tags <span className="text-xs font-normal" />
+                tags <span className="text-xs font-normal">(optional)</span>
               </label>
               <Input
                 id="tags"
@@ -128,9 +128,9 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
             <div>
               <label
                 htmlFor="notes"
-                className="block text-sm font-medium mb-2 text-muted-foreground"
+                className="block text-sm font-medium mb-2 text-gray-600 dark:text-gray-300"
               >
-                notes <span className="text-xs font-normal" />
+                notes <span className="text-xs font-normal">(optional)</span>
               </label>
               <Input
                 id="notes"
@@ -144,17 +144,23 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
 
           <Button
             type="submit"
-            className={`w-full transition-all duration-300 ${isSuccess ? "bg-green-500 hover:bg-green-500" : ""}`}
+            className={`w-full transition-all duration-300 ${
+              isSuccess 
+                ? "bg-green-600 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-700" 
+                : isSubmitting
+                ? "opacity-80"
+                : ""
+            }`}
             disabled={isSubmitting || isSuccess}
           >
             <div className="flex items-center justify-center gap-2">
               {isSuccess ? (
                 <>
-                  <Check className="w-4 h-4" />
-                  <span className="animate-pulse">saved!</span>
+                  <Check className="w-4 h-4 text-white" />
+                  <span className="text-white">saved!</span>
                 </>
               ) : isSubmitting ? (
-                <span className="animate-pulse">saving...</span>
+                <span className="text-muted-foreground">saving...</span>
               ) : (
                 "save"
               )}

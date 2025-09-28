@@ -254,7 +254,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
           <TrendingUp className="w-5 h-5" />
           history
         </CardTitle>
-        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
           <span>average: {averageRating}/10</span>
           {trend && (
             <>
@@ -324,7 +324,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                 strokeWidth={2}
                 dot={{ fill: lineColor, strokeWidth: 1, r: 3 }}
                 activeDot={{
-                  r: 4,
+                  r: 3,
                   stroke: lineColor,
                   strokeWidth: 2,
                   fill: lineColor,

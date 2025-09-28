@@ -190,3 +190,28 @@
     letter-spacing: var(--tracking-normal);
   }
 }
+
+/* Remove focus outlines from chart elements */
+svg,
+svg *,
+.recharts-wrapper,
+.recharts-wrapper *,
+.recharts-surface,
+.recharts-cartesian-grid,
+.recharts-line,
+.recharts-dot {
+  outline: none !important;
+  border: none !important;
+}
+
+svg:focus,
+svg *:focus {
+  outline: none !important;
+  border: none !important;
+}
+
+/* Dark mode input overrides */
+.dark input[type="text"] {
+  background-color: #000000 !important;
+  color: white !important;
+}
