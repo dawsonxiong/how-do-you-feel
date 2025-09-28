@@ -1,18 +1,18 @@
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
+import { format, parseISO } from "date-fns"
+import { Calendar, TrendingUp } from "lucide-react"
+import { useEffect, useState } from "react"
 import {
-  LineChart,
+  CartesianGrid,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { format, parseISO } from 'date-fns'
-import { TrendingUp, Calendar } from 'lucide-react'
+} from "recharts"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface MoodData {
   date: string
@@ -33,7 +33,11 @@ interface MoodChartProps {
   refreshTrigger?: number
 }
 
-const CustomTooltip = ({ active, payload, label }: {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: {
   active?: boolean
   payload?: Array<{
     payload: MoodData
@@ -45,17 +49,15 @@ const CustomTooltip = ({ active, payload, label }: {
     const data = payload[0].payload
     return (
       <div className="bg-background border rounded-lg p-3 shadow-md">
-        <p className="font-medium">{format(parseISO(label || ''), 'MMM dd, yyyy')}</p>
+        <p className="font-medium">{format(parseISO(label || ""), "MMM dd, yyyy")}</p>
         <p className="text-primary">
           <span className="font-medium">Mood: {payload[0].value}</span>
           <span className="text-muted-foreground ml-2">
-            ({data.entryCount} {data.entryCount === 1 ? 'entry' : 'entries'})
+            ({data.entryCount} {data.entryCount === 1 ? "entry" : "entries"})
           </span>
         </p>
         {data.entries.length > 0 && data.entries[0].notes && (
-          <p className="text-sm text-muted-foreground mt-1">
-            "{data.entries[0].notes}"
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">"{data.entries[0].notes}"</p>
         )}
       </div>
     )
@@ -69,13 +71,13 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
 
   const fetchMoodData = async () => {
     try {
-      const response = await fetch('/api/mood')
+      const response = await fetch("/api/mood")
       if (response.ok) {
         const moodData = await response.json()
         setData(moodData)
       }
     } catch (error) {
-      console.error('Error fetching mood data:', error)
+      console.error("Error fetching mood data:", error)
     } finally {
       setIsLoading(false)
     }
@@ -89,7 +91,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   const formatXAxisLabel = (tickItem: string) => {
     try {
       const date = parseISO(tickItem)
-      return format(date, 'MMM dd')
+      return format(date, "MMM dd")
     } catch {
       return tickItem
     }
@@ -97,24 +99,26 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
 
   const getAverageRating = () => {
     if (data.length === 0) return 0
-    return Math.round((data.reduce((sum, entry) => sum + entry.rating, 0) / data.length) * 100) / 100
+    return (
+      Math.round((data.reduce((sum, entry) => sum + entry.rating, 0) / data.length) * 100) / 100
+    )
   }
 
   const getRecentTrend = () => {
     if (data.length < 2) return null
     const recent = data.slice(-7) // Last 7 entries
     if (recent.length < 2) return null
-    
+
     const firstHalf = recent.slice(0, Math.floor(recent.length / 2))
     const secondHalf = recent.slice(Math.floor(recent.length / 2))
-    
+
     const firstAvg = firstHalf.reduce((sum, entry) => sum + entry.rating, 0) / firstHalf.length
     const secondAvg = secondHalf.reduce((sum, entry) => sum + entry.rating, 0) / secondHalf.length
-    
+
     const difference = secondAvg - firstAvg
-    
-    if (Math.abs(difference) < 0.1) return 'stable'
-    return difference > 0 ? 'improving' : 'declining'
+
+    if (Math.abs(difference) < 0.1) return "stable"
+    return difference > 0 ? "improving" : "declining"
   }
 
   if (isLoading) {
@@ -169,15 +173,21 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
           <span>Average: {averageRating}/10</span>
           {trend && (
-            <span className={`font-medium ${
-              trend === 'improving' ? 'text-green-600' : 
-              trend === 'declining' ? 'text-red-600' : 
-              'text-blue-600'
-            }`}>
+            <span
+              className={`font-medium ${
+                trend === "improving"
+                  ? "text-green-600"
+                  : trend === "declining"
+                    ? "text-red-600"
+                    : "text-blue-600"
+              }`}
+            >
               Recent trend: {trend}
             </span>
           )}
-          <span>{data.length} {data.length === 1 ? 'day' : 'days'} tracked</span>
+          <span>
+            {data.length} {data.length === 1 ? "day" : "days"} tracked
+          </span>
         </div>
       </CardHeader>
       <CardContent>
@@ -185,23 +195,20 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis 
-                dataKey="date" 
-                tickFormatter={formatXAxisLabel}
-                className="text-xs"
-              />
-              <YAxis 
-                domain={[0, 10]} 
-                className="text-xs"
-              />
+              <XAxis dataKey="date" tickFormatter={formatXAxisLabel} className="text-xs" />
+              <YAxis domain={[0, 10]} className="text-xs" />
               <Tooltip content={<CustomTooltip />} />
-              <Line 
-                type="monotone" 
-                dataKey="rating" 
-                stroke="hsl(var(--primary))" 
+              <Line
+                type="monotone"
+                dataKey="rating"
+                stroke="hsl(var(--primary))"
                 strokeWidth={3}
-                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 5 }}
-                activeDot={{ r: 7, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+                dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 5 }}
+                activeDot={{
+                  r: 7,
+                  stroke: "hsl(var(--primary))",
+                  strokeWidth: 2,
+                }}
               />
             </LineChart>
           </ResponsiveContainer>

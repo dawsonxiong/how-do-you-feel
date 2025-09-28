@@ -1,14 +1,14 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { MoodEntryForm } from '@/components/mood-entry-form'
-import { MoodChart } from '@/components/mood-chart'
+import { useState } from "react"
+import { MoodChart } from "@/components/mood-chart"
+import { MoodEntryForm } from "@/components/mood-entry-form"
 
 export default function Home() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const handleMoodEntrySuccess = () => {
-    setRefreshTrigger(prev => prev + 1)
+    setRefreshTrigger((prev) => prev + 1)
   }
 
   return (
@@ -20,7 +20,8 @@ export default function Home() {
             How Do You Feel?
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Track your daily mood and emotions. Discover patterns in your mental wellbeing with beautiful visualizations.
+            Track your daily mood and emotions. Discover patterns in your mental wellbeing with
+            beautiful visualizations.
           </p>
         </header>
 

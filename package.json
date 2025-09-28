@@ -4,9 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:clean": "rm -rf .next && next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start",
-    "lint": "eslint"
+    "typecheck": "tsc --noEmit --incremental",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:migrate": "prisma migrate dev",
+    "lint": "biome check --write .",
+    "format": "biome format --write .",
+    "check": "biome check ."
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
