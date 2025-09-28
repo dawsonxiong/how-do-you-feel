@@ -102,6 +102,7 @@ const CustomTooltip = ({
 export function MoodChart({ refreshTrigger }: MoodChartProps) {
   const [data, setData] = useState<MoodData[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
 
   const fetchMoodData = async () => {
     try {
@@ -120,6 +121,18 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   useEffect(() => {
     fetchMoodData()
   }, [refreshTrigger])
+
+  useEffect(() => {
+    // Check mobile on mount and resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const formatXAxisLabel = (tickItem: string) => {
     try {
@@ -141,6 +154,15 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   }
 
   const getTickInterval = () => {
+    if (isMobile) {
+      // Much more spacing on mobile to prevent overlap
+      if (data.length <= 7) {
+        return 1 // Show every other day
+      }
+      return Math.max(6, Math.floor(data.length / 4)) // Show ~4 labels max on mobile
+    }
+    
+    // Desktop spacing (original logic)
     if (data.length <= 7) {
       return 0 // Show all days
     } 
@@ -247,12 +269,26 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
           </span>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
+      <CardContent style={{ outline: 'none', border: 'none' }}>
+        <div className={`w-full ${isMobile ? 'h-80' : 'h-64'}`}>
+          <ResponsiveContainer 
+            width="100%" 
+            height="100%"
+            style={{ outline: 'none' }}
+          >
             <LineChart 
               data={data}
-              margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+              style={{ 
+                outline: 'none',
+                border: 'none',
+                userSelect: 'none',
+                WebkitTapHighlightColor: 'transparent'
+              }}
+              margin={{ 
+                top: 20, 
+                right: 40, 
+                bottom: isMobile ? 60 : 20 
+              }}
             >
               <CartesianGrid 
                 strokeDasharray="3 3" 
@@ -264,13 +300,25 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                 tickFormatter={formatXAxisLabel}
                 className="text-xs"
                 interval={getTickInterval()}
+                angle={isMobile ? -45 : 0}
+                textAnchor={isMobile ? "end" : "middle"}
+                height={isMobile ? 60 : 30}
               />
               <YAxis 
                 domain={[0, 10]} 
                 ticks={[0, 2, 4, 6, 8, 10]} 
                 className="text-xs"
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip 
+                content={<CustomTooltip />}
+                allowEscapeViewBox={{ x: false, y: true }}
+                cursor={false}
+                wrapperStyle={{ 
+                  pointerEvents: 'none',
+                  outline: 'none',
+                  border: 'none'
+                }}
+              />
                 <Line
                   type="linear"
                   dataKey="rating"
@@ -282,6 +330,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                     stroke: "#000000",
                     strokeWidth: 2,
                     fill: "#000000",
+                    style: { pointerEvents: 'none' }
                   }}
                   connectNulls={false}
                   animationBegin={0}
