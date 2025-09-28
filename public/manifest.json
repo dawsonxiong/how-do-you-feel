@@ -1,0 +1,20 @@
+{
+  "name": "How Do You Feel?",
+  "short_name": "Mood Tracker",
+  "description": "Track your daily mood and emotions. Discover patterns in your mental wellbeing with beautiful visualizations.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "categories": ["health", "lifestyle", "productivity"],
+  "lang": "en",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

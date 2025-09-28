@@ -18,6 +18,24 @@ const jetBrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "how do u feel?",
   description: "Track your daily mood and emotions. Discover patterns in your mental wellbeing with beautiful visualizations.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "How Do You Feel?",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  },
 }
 
 export default function RootLayout({
