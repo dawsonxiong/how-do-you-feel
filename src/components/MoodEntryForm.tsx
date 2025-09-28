@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart, Check } from "lucide-react"
+import { Check, Heart } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -52,7 +52,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
       if (response.ok) {
         // Show success animation
         setIsSuccess(true)
-        
+
         // Reset form after animation
         setTimeout(() => {
           setRating([5])
@@ -83,7 +83,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <div className="text-center mb-6">
+            <div className="text-center mb-4">
               <div className="text-base">
                 <span className="text-primary">{rating[0]}</span>
                 <span>/10</span>
@@ -110,8 +110,11 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="tags" className="block text-sm font-medium mb-2 text-muted-foreground">
-                tags <span className="text-xs font-normal"/>
+              <label
+                htmlFor="tags"
+                className="block text-sm font-medium mb-2 text-muted-foreground"
+              >
+                tags <span className="text-xs font-normal" />
               </label>
               <Input
                 id="tags"
@@ -123,8 +126,11 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
             </div>
 
             <div>
-              <label htmlFor="notes" className="block text-sm font-medium mb-2 text-muted-foreground">
-                notes <span className="text-xs font-normal"/>
+              <label
+                htmlFor="notes"
+                className="block text-sm font-medium mb-2 text-muted-foreground"
+              >
+                notes <span className="text-xs font-normal" />
               </label>
               <Input
                 id="notes"
@@ -136,8 +142,8 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
             </div>
           </div>
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className={`w-full transition-all duration-300 ${isSuccess ? "bg-green-500 hover:bg-green-500" : ""}`}
             disabled={isSubmitting || isSuccess}
           >

@@ -48,9 +48,9 @@ const CustomTooltip = ({
 }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
-    
+
     // All data points should have data now
-    
+
     const hasMultipleEntries = data.entryCount > 1
 
     return (
@@ -127,11 +127,11 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
     }
-    
+
     checkMobile()
-    window.addEventListener('resize', checkMobile)
-    
-    return () => window.removeEventListener('resize', checkMobile)
+    window.addEventListener("resize", checkMobile)
+
+    return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
   const formatXAxisLabel = (tickItem: string) => {
@@ -139,11 +139,11 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
       const date = parseISO(tickItem)
       const now = new Date()
       const daysDiff = Math.abs((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
-      
+
       // Adaptive formatting based on recency
       if (daysDiff < 7) {
         return format(date, "EEE") // "Mon", "Tue"
-      } 
+      }
       if (daysDiff < 30) {
         return format(date, "MMM dd") // "Sep 15"
       }
@@ -161,13 +161,13 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
       }
       return Math.max(6, Math.floor(data.length / 4)) // Show ~4 labels max on mobile
     }
-    
+
     // Desktop spacing (original logic)
     if (data.length <= 7) {
       return 0 // Show all days
-    } 
+    }
     if (data.length <= 30) {
-      return 2 // Show every 3rd day  
+      return 2 // Show every 3rd day
     }
     if (data.length <= 60) {
       return 4 // Show every 5th day
@@ -184,7 +184,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
 
   const getRecentTrend = () => {
     if (data.length < 4) return null
-    
+
     const recent = data.slice(-10) // Last 10 entries
     if (recent.length < 4) return null
 
@@ -259,7 +259,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                   : trend === "declining"
                     ? "text-red-600"
                     : "text-blue-600"
-              }`} 
+              }`}
             >
               recent trend: {trend}
             </span>
@@ -269,33 +269,26 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
           </span>
         </div>
       </CardHeader>
-      <CardContent style={{ outline: 'none', border: 'none' }}>
-        <div className={`w-full ${isMobile ? 'h-80' : 'h-64'}`}>
-          <ResponsiveContainer 
-            width="100%" 
-            height="100%"
-            style={{ outline: 'none' }}
-          >
-            <LineChart 
+      <CardContent style={{ outline: "none", border: "none" }}>
+        <div className={`w-full ${isMobile ? "h-80" : "h-64"}`}>
+          <ResponsiveContainer width="100%" height="100%" style={{ outline: "none" }}>
+            <LineChart
               data={data}
-              style={{ 
-                outline: 'none',
-                border: 'none',
-                userSelect: 'none',
-                WebkitTapHighlightColor: 'transparent'
+              style={{
+                outline: "none",
+                border: "none",
+                userSelect: "none",
+                WebkitTapHighlightColor: "transparent",
               }}
-              margin={{ 
-                top: 20, 
-                right: 40, 
-                bottom: isMobile ? 60 : 20 
+              margin={{
+                top: 20,
+                right: 40,
+                bottom: isMobile ? 60 : 20,
               }}
             >
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                className="opacity-30"
-              />
-              <XAxis 
-                dataKey="date" 
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis
+                dataKey="date"
                 type="category"
                 tickFormatter={formatXAxisLabel}
                 className="text-xs"
@@ -304,40 +297,36 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                 textAnchor={isMobile ? "end" : "middle"}
                 height={isMobile ? 60 : 30}
               />
-              <YAxis 
-                domain={[0, 10]} 
-                ticks={[0, 2, 4, 6, 8, 10]} 
-                className="text-xs"
-              />
-              <Tooltip 
+              <YAxis domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} className="text-xs" />
+              <Tooltip
                 content={<CustomTooltip />}
                 allowEscapeViewBox={{ x: false, y: true }}
                 cursor={false}
-                wrapperStyle={{ 
-                  pointerEvents: 'none',
-                  outline: 'none',
-                  border: 'none'
+                wrapperStyle={{
+                  pointerEvents: "none",
+                  outline: "none",
+                  border: "none",
                 }}
               />
-                <Line
-                  type="linear"
-                  dataKey="rating"
-                  stroke="#000000"
-                  strokeWidth={2}
-                  dot={{ fill: "#000000", strokeWidth: 1, r: 3 }}
-                  activeDot={{
-                    r: 4,
-                    stroke: "#000000",
-                    strokeWidth: 2,
-                    fill: "#000000",
-                    style: { pointerEvents: 'none' }
-                  }}
-                  connectNulls={false}
-                  animationBegin={0}
-                  animationDuration={1500}
-                  animationEasing="ease-out"
-                  isAnimationActive={true}
-                />
+              <Line
+                type="linear"
+                dataKey="rating"
+                stroke="#000000"
+                strokeWidth={2}
+                dot={{ fill: "#000000", strokeWidth: 1, r: 3 }}
+                activeDot={{
+                  r: 4,
+                  stroke: "#000000",
+                  strokeWidth: 2,
+                  fill: "#000000",
+                  style: { pointerEvents: "none" },
+                }}
+                connectNulls={false}
+                animationBegin={0}
+                animationDuration={1500}
+                animationEasing="ease-out"
+                isAnimationActive={true}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
