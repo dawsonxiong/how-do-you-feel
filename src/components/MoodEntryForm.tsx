@@ -12,17 +12,17 @@ interface MoodEntryFormProps {
 }
 
 const moodLabels = {
-  0: "Terrible 😰",
-  1: "Very Sad 😢",
-  2: "Sad 😔",
-  3: "Down 🙁",
-  4: "Low 😕",
-  5: "Neutral 😐",
-  6: "Okay 🙂",
-  7: "Good 😊",
-  8: "Happy 😁",
-  9: "Great 🤩",
-  10: "Amazing! 🚀",
+  0: "Terrible",
+  1: "Very Sad",
+  2: "Sad",
+  3: "Down",
+  4: "Low",
+  5: "Neutral",
+  6: "Okay",
+  7: "Good",
+  8: "Happy",
+  9: "Great",
+  10: "Amazing!",
 }
 
 export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
@@ -68,17 +68,21 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-center justify-center">
-          <Heart className="w-5 h-5 text-red-500" />
+        <CardTitle className="flex items-center gap-2 text-center text-xl">
+          <Heart className="w-5 h-5" />
           How are you feeling?
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">{rating[0]}</div>
-              <div className="text-lg mb-4">{moodLabels[rating[0] as keyof typeof moodLabels]}</div>
+            <div className="text-center mb-6">
+              <div className="text-base">
+                <span className="text-xl font-bold text-primary">{rating[0]}</span>
+                <span className="text-muted-foreground">/10</span>
+                <span className="mx-2 text-muted-foreground">–</span>
+                <span>{moodLabels[rating[0] as keyof typeof moodLabels]}</span>
+              </div>
             </div>
 
             <div className="px-2">
@@ -90,17 +94,17 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
                 step={1}
                 className="w-full"
               />
-              <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                <span>Terrible</span>
-                <span>Amazing</span>
+              <div className="flex justify-between text-xs text-muted-foreground/60 mt-2">
+                <span>0</span>
+                <span>10</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="tags" className="block text-sm font-medium mb-2">
-                Tags (optional)
+              <label htmlFor="tags" className="block text-sm font-medium mb-2 text-muted-foreground">
+                Tags <span className="text-xs font-normal">(optional)</span>
               </label>
               <Input
                 id="tags"
@@ -109,12 +113,11 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground mt-1">Separate tags with commas</p>
             </div>
 
             <div>
-              <label htmlFor="notes" className="block text-sm font-medium mb-2">
-                Notes (optional)
+              <label htmlFor="notes" className="block text-sm font-medium mb-2 text-muted-foreground">
+                Notes <span className="text-xs font-normal">(optional)</span>
               </label>
               <Input
                 id="notes"

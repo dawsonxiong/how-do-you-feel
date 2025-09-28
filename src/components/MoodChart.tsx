@@ -47,17 +47,47 @@ const CustomTooltip = ({
 }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
+    const hasMultipleEntries = data.entryCount > 1
+    
     return (
-      <div className="bg-background border rounded-lg p-3 shadow-md">
-        <p className="font-medium">{format(parseISO(label || ""), "MMM dd, yyyy")}</p>
+      <div className="bg-background border rounded-lg p-3 shadow-md max-w-xs">
+        <p className="font-medium text-sm">{format(parseISO(label || ""), "MMM dd, yyyy")}</p>
         <p className="text-primary">
-          <span className="font-medium">Mood: {payload[0].value}</span>
-          <span className="text-muted-foreground ml-2">
+          <span className="font-medium text-sm">
+            {hasMultipleEntries ? `Average: ${payload[0].value}` : `Mood: ${payload[0].value}`}
+          </span>
+          <span className="text-muted-foreground ml-2 text-sm">
             ({data.entryCount} {data.entryCount === 1 ? "entry" : "entries"})
           </span>
         </p>
-        {data.entries.length > 0 && data.entries[0].notes && (
-          <p className="text-sm text-muted-foreground mt-1">"{data.entries[0].notes}"</p>
+        
+        {/* Show details for multiple entries */}
+        {hasMultipleEntries ? (
+          <div className="mt-2 space-y-1">
+            {data.entries.map((entry, index) => (
+              <div key={entry.id} className="text-xs border-l-2 border-muted pl-2">
+                <span className="font-medium text-primary">{entry.rating}</span>
+                {entry.tags && (
+                  <span className="text-muted-foreground ml-2">#{entry.tags.replace(/,/g, ' #')}</span>
+                )}
+                {entry.notes && (
+                  <p className="text-muted-foreground mt-0.5">"{entry.notes}"</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          // Single entry details
+          <div className="mt-2">
+            {data.entries[0]?.tags && (
+              <p className="text-xs text-muted-foreground">
+                #{data.entries[0].tags.replace(/,/g, ' #')}
+              </p>
+            )}
+            {data.entries[0]?.notes && (
+              <p className="text-sm text-muted-foreground mt-1">"{data.entries[0].notes}"</p>
+            )}
+          </div>
         )}
       </div>
     )
@@ -124,7 +154,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-xl">
             <TrendingUp className="w-5 h-5" />
             Your Mood Journey
           </CardTitle>
@@ -142,7 +172,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-xl">
             <TrendingUp className="w-5 h-5" />
             Your Mood Journey
           </CardTitle>
@@ -165,7 +195,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-xl">
           <TrendingUp className="w-5 h-5" />
           Your Mood Journey
         </CardTitle>
@@ -204,7 +234,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                 strokeWidth={3}
                 dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 5 }}
                 activeDot={{
-                  r: 7,
+                  r: 6,
                   stroke: "hsl(var(--primary))",
                   strokeWidth: 2,
                 }}

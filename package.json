@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit --incremental",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
+    "prisma:reset": "prisma db reset",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "lint": "biome check --write .",
