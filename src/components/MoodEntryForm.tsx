@@ -130,7 +130,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Entry"}
+            {isSubmitting ? "saving..." : "save"}
           </Button>
         </form>
       </CardContent>

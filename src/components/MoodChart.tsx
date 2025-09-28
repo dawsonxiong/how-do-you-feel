@@ -54,7 +54,7 @@ const CustomTooltip = ({
         <p className="font-medium text-sm">{format(parseISO(label || ""), "MMM dd, yyyy")}</p>
         <p className="text-primary">
           <span className="font-medium text-sm">
-            {hasMultipleEntries ? `Average: ${payload[0].value}` : `Mood: ${payload[0].value}`}
+            {hasMultipleEntries ? `Average: ${payload[0].value}` : `mood: ${payload[0].value}`}
           </span>
           <span className="text-muted-foreground ml-2 text-sm">
             ({data.entryCount} {data.entryCount === 1 ? "entry" : "entries"})
