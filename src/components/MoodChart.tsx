@@ -142,42 +142,47 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   const formatXAxisLabel = (tickItem: string) => {
     try {
       const date = parseISO(tickItem)
-      const now = new Date()
-      const daysDiff = Math.abs((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+      const totalDays = data.length
 
-      // Adaptive formatting based on recency
-      if (daysDiff < 7) {
-        return format(date, "EEE") // "Mon", "Tue"
+      // Industry standard: Format based on total data range (like Apple Health)
+      if (totalDays <= 7) {
+        // 1 Week: Show day names
+        return format(date, "EEE") // "Mon", "Tue", "Wed"
       }
-      if (daysDiff < 30) {
-        return format(date, "MMM dd") // "Sep 15"
+      
+      if (totalDays <= 30) {
+        // 1 Month: Show month + day for context
+        return format(date, isMobile ? "M/d" : "MMM d") // "9/15" or "Sep 15"
       }
-      return format(date, "MMM dd") // Keep consistent for 30-day view
+      
+      if (totalDays <= 90) {
+        // 3 Months: Show month + day for key dates
+        return format(date, isMobile ? "M/d" : "MMM d") // "9/15" or "Sep 15"
+      }
+      
+      // 3+ Months: Show month names only (like Apple Health yearly view)
+      return format(date, "MMM") // "Sep", "Oct", "Nov"
     } catch {
       return tickItem
     }
   }
 
   const getTickInterval = () => {
+    const totalDays = data.length
+    
     if (isMobile) {
-      // Much more spacing on mobile to prevent overlap
-      if (data.length <= 7) {
-        return 1 // Show every other day
-      }
-      return Math.max(6, Math.floor(data.length / 4)) // Show ~4 labels max on mobile
+      // Mobile: Industry standard - fewer labels for readability
+      if (totalDays <= 7) return 0   // 1 Week: Show all days
+      if (totalDays <= 30) return 4  // 1 Month: Every 5th day (like "1", "5", "10", "15")
+      return Math.max(6, Math.floor(totalDays / 4)) // Longer: ~4 labels max
     }
 
-    // Desktop spacing (original logic)
-    if (data.length <= 7) {
-      return 0 // Show all days
-    }
-    if (data.length <= 30) {
-      return 2 // Show every 3rd day
-    }
-    if (data.length <= 60) {
-      return 4 // Show every 5th day
-    }
-    return 6 // Show every 7th day for longer periods
+    // Desktop: Industry standard intervals
+    if (totalDays <= 7) return 0   // 1 Week: Show all days (Mon, Tue, Wed...)
+    if (totalDays <= 14) return 1  // 2 Weeks: Every other day
+    if (totalDays <= 30) return 4  // 1 Month: Every 5th day (1, 6, 11, 16, 21, 26)
+    if (totalDays <= 90) return 6  // 3 Months: Every 7th day (weekly markers)
+    return 10 // 3+ Months: Every ~11th day for monthly markers
   }
 
   const getAverageRating = () => {
@@ -278,7 +283,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
           </span>
         </div>
       </CardHeader>
-      <CardContent style={{ outline: "none", border: "none" }}>
+      <CardContent className="px-0" style={{ outline: "none", border: "none" }}>
         <div className={`w-full ${isMobile ? "h-80" : "h-64"}`}>
           <ResponsiveContainer width="100%" height="100%" style={{ outline: "none" }}>
             <LineChart

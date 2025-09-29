@@ -17,8 +17,8 @@ export function UserProfile() {
         <Image
           src={session.user.image}
           alt={session.user.name || "User"}
-          width={32}
-          height={32}
+          width={16}
+          height={16}
           className="rounded-full w-8 h-8"
         />
       ) : (
