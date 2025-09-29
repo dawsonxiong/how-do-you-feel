@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import { AuthProvider } from "@/components/AuthProvider"
+import { ThemeProvider } from "@/components/ThemeProvider"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -54,7 +55,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>

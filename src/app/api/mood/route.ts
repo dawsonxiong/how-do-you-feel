@@ -1,10 +1,17 @@
 import { format, startOfDay } from "date-fns"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
+import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const session = await auth()
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const { rating, tags, notes } = await request.json()
 
     if (typeof rating !== "number" || rating < 0 || rating > 10) {
@@ -19,6 +26,7 @@ export async function POST(request: NextRequest) {
 
     const moodEntry = await prisma.moodEntry.create({
       data: {
+        userId: session.user.id,
         rating,
         date: today,
         tags: tags || null,
@@ -35,8 +43,17 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    // Get all mood entries
+    // Check authentication
+    const session = await auth()
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    // Get mood entries for the authenticated user only
     const moodEntries = await prisma.moodEntry.findMany({
+      where: {
+        userId: session.user.id,
+      },
       orderBy: {
         date: "asc",
       },

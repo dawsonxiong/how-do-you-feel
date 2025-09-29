@@ -46,3 +46,6 @@ next-env.d.ts
 
 # database
 *.db
+
+# seeding function
+scripts/seed-data.js

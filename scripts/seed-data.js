@@ -62,9 +62,21 @@ function getRandomRating() {
 async function seedData() {
   console.log("🌱 Seeding mood data...")
 
-  // Clear existing data
+  // Clear existing mood entries only (keep your auth data)
   await prisma.moodEntry.deleteMany()
-  console.log("🧹 Cleared existing data")
+  console.log("🧹 Cleared existing mood entries")
+
+  // Find your existing Google account
+  const existingUser = await prisma.user.findUnique({
+    where: { email: "dawsonxiong@gmail.com" }
+  })
+
+  if (!existingUser) {
+    console.log("❌ Could not find your Google account. Please sign in first at http://localhost:3000")
+    process.exit(1)
+  }
+
+  console.log(`👤 Using your account: ${existingUser.name} (${existingUser.email})`)
 
   const currentDate = new Date("2024-09-28T13:28:48.848Z")
   const entries = []
@@ -88,6 +100,7 @@ async function seedData() {
       const shouldHaveNotes = rating <= 2 || rating >= 9 || Math.random() < 0.3
 
       entries.push({
+        userId: existingUser.id,
         rating: rating,
         date: new Date(date.getFullYear(), date.getMonth(), date.getDate()), // Start of day
         tags: shouldHaveTags ? getRandomElement(sampleTags) : null,
@@ -103,7 +116,7 @@ async function seedData() {
     })
   }
 
-  console.log(`✅ Created ${entries.length} mood entries`)
+  console.log(`✅ Created ${entries.length} mood entries for your account`)
   console.log(
     `📊 Date range: ${Math.min(...entries.map((e) => e.date))} to ${Math.max(...entries.map((e) => e.date))}`
   )

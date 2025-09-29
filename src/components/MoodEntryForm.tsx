@@ -145,11 +145,11 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
           <Button
             type="submit"
             className={`w-full transition-all duration-300 ${
-              isSuccess 
-                ? "bg-green-600 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-700" 
+              isSuccess
+                ? "bg-green-600 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-700"
                 : isSubmitting
-                ? "opacity-80"
-                : ""
+                  ? "opacity-80"
+                  : ""
             }`}
             disabled={isSubmitting || isSuccess}
           >
