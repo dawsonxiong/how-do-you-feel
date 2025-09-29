@@ -2,7 +2,7 @@
 
 import { LogOut, User } from "lucide-react"
 import Image from "next/image"
-import { signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 
 export function UserProfile() {
@@ -20,9 +20,9 @@ export function UserProfile() {
           <Image
             src={session.user.image}
             alt={session.user.name || "User"}
-            width={16}
-            height={16}
-            className="rounded-full"
+            width={32}
+            height={32}
+            className="rounded-full w-8 h-8"
           />
         ) : (
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -35,15 +35,17 @@ export function UserProfile() {
       </div>
 
       {/* Sign Out Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-        className="h-8 w-8 rounded-full hover:bg-accent transition-colors"
-      >
-        <LogOut className="h-4 w-4" />
-        <span className="sr-only">Sign out</span>
-      </Button>
+      <form action="/api/auth/signout" method="post">
+        <Button
+          type="submit"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 rounded-full hover:bg-accent transition-colors"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="sr-only">Sign out</span>
+        </Button>
+      </form>
     </div>
   )
 }
