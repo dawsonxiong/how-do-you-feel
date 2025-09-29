@@ -23,7 +23,7 @@ export default function SignInPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:bg-black dark:bg-none flex items-center justify-center p-4">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
