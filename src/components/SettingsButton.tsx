@@ -14,7 +14,6 @@ export function SettingsButton() {
 
   const handleSettingsClick = () => {
     // Functionality to be implemented later
-    console.log("Settings clicked")
   }
 
   if (!mounted) {

@@ -37,7 +37,6 @@ export const config = {
   experimental: {
     enableWebAuthn: false,
   },
-  debug: process.env.NODE_ENV === "development",
   trustHost: true,
   useSecureCookies: process.env.NODE_ENV === "production",
   cookies: {
