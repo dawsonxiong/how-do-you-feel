@@ -5,7 +5,6 @@ import { AuthGuard } from "@/components/AuthGuard"
 import { MoodChart } from "@/components/MoodChart"
 import { MoodEntryForm } from "@/components/MoodEntryForm"
 import { SettingsButton } from "@/components/SettingsButton"
-import { ThemeToggle } from "@/components/ThemeToggle"
 import { UserProfile } from "@/components/UserProfile"
 
 export default function Home() {
@@ -39,9 +38,7 @@ export default function Home() {
           {/* Footer */}
           <footer className="mt-8 text-muted-foreground">
             <div className="flex items-center justify-between w-full mx-auto">
-              <div>
-                <ThemeToggle />
-              </div>
+              <div />
               <div className="flex-1 flex justify-center">
                 <p className="text-sm text-center">for j</p>
               </div>
