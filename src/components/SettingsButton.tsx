@@ -1,8 +1,8 @@
 "use client"
 
-import { Settings, LogOut, Moon, Sun } from "lucide-react"
-import * as React from "react"
+import { LogOut, Moon, Settings, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
+import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -23,9 +23,9 @@ export function SettingsButton() {
 
   const handleSignOut = () => {
     // Create a form and submit it to sign out
-    const form = document.createElement('form')
-    form.method = 'post'
-    form.action = '/api/auth/signout'
+    const form = document.createElement("form")
+    form.method = "post"
+    form.action = "/api/auth/signout"
     document.body.appendChild(form)
     form.submit()
   }

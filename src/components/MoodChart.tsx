@@ -149,17 +149,17 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
         // 1 Week: Show day names
         return format(date, "EEE") // "Mon", "Tue", "Wed"
       }
-      
+
       if (totalDays <= 30) {
         // 1 Month: Show month + day for context
         return format(date, isMobile ? "M/d" : "MMM d") // "9/15" or "Sep 15"
       }
-      
+
       if (totalDays <= 90) {
         // 3 Months: Show month + day for key dates
         return format(date, isMobile ? "M/d" : "MMM d") // "9/15" or "Sep 15"
       }
-      
+
       // 3+ Months: Show month names only (like Apple Health yearly view)
       return format(date, "MMM") // "Sep", "Oct", "Nov"
     } catch {
@@ -169,19 +169,19 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
 
   const getTickInterval = () => {
     const totalDays = data.length
-    
+
     if (isMobile) {
       // Mobile: Industry standard - fewer labels for readability
-      if (totalDays <= 7) return 0   // 1 Week: Show all days
-      if (totalDays <= 30) return 4  // 1 Month: Every 5th day (like "1", "5", "10", "15")
+      if (totalDays <= 7) return 0 // 1 Week: Show all days
+      if (totalDays <= 30) return 4 // 1 Month: Every 5th day (like "1", "5", "10", "15")
       return Math.max(6, Math.floor(totalDays / 4)) // Longer: ~4 labels max
     }
 
     // Desktop: Industry standard intervals
-    if (totalDays <= 7) return 0   // 1 Week: Show all days (Mon, Tue, Wed...)
-    if (totalDays <= 14) return 1  // 2 Weeks: Every other day
-    if (totalDays <= 30) return 4  // 1 Month: Every 5th day (1, 6, 11, 16, 21, 26)
-    if (totalDays <= 90) return 6  // 3 Months: Every 7th day (weekly markers)
+    if (totalDays <= 7) return 0 // 1 Week: Show all days (Mon, Tue, Wed...)
+    if (totalDays <= 14) return 1 // 2 Weeks: Every other day
+    if (totalDays <= 30) return 4 // 1 Month: Every 5th day (1, 6, 11, 16, 21, 26)
+    if (totalDays <= 90) return 6 // 3 Months: Every 7th day (weekly markers)
     return 10 // 3+ Months: Every ~11th day for monthly markers
   }
 

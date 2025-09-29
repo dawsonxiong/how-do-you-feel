@@ -19,11 +19,11 @@ export function UserProfile() {
           alt={session.user.name || "User"}
           width={16}
           height={16}
-          className="rounded-full w-8 h-8"
+          className="rounded-full w-4 h-4"
         />
       ) : (
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-          <User className="w-4 h-4" />
+        <div className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center">
+          <User className="w-3 h-3" />
         </div>
       )}
       <div className="hidden sm:block">
