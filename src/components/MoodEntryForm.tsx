@@ -119,7 +119,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
               <Input
                 id="tags"
                 type="text"
-                placeholder="work, family, exercise..."
+                placeholder="work, friends, family..."
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
               />

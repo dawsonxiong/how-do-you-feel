@@ -4,6 +4,7 @@ import { useState } from "react"
 import { MoodChart } from "@/components/MoodChart"
 import { MoodEntryForm } from "@/components/MoodEntryForm"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { SettingsButton } from "@/components/settings-button"
 
 export default function Home() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
@@ -36,7 +37,9 @@ export default function Home() {
             <div className="flex-1 flex justify-center">
               <p className="text-sm text-center">for j</p>
             </div>
-            <div className="w-8" />
+            <div>
+              <SettingsButton />
+            </div>
           </div>
         </footer>
       </div>
