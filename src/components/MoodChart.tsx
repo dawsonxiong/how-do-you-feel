@@ -95,7 +95,7 @@ const CustomTooltip = ({
                   <span className="text-xs text-muted-foreground ml-1">(you)</span>
                 )}
               </p>
-              <p className="text-primary font-medium">{entry.value}/10</p>
+              <p className="text-sm font-medium">{entry.value}/10</p>
             </div>
           ))}
         </div>
