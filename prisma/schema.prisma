@@ -49,9 +49,11 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts    Account[]
-  sessions    Session[]
-  moodEntries MoodEntry[]
+  accounts          Account[]
+  sessions          Session[]
+  moodEntries       MoodEntry[]
+  sharingMoodWith   MoodShare[] @relation("SharingMoodFrom") // Users I'm sharing my mood with
+  viewingMoodFrom   MoodShare[] @relation("SharingMoodTo")   // Users whose mood I can view
 
   @@map("users")
 }
@@ -69,4 +71,17 @@ model MoodEntry {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("mood_entries")
+}
+
+model MoodShare {
+  id         String   @id @default(cuid())
+  fromUserId String   // User sharing their mood data
+  toUserId   String   // User who can view the mood data
+  createdAt  DateTime @default(now())
+
+  fromUser User @relation("SharingMoodFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User @relation("SharingMoodTo", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@unique([fromUserId, toUserId])
+  @@map("mood_shares")
 }

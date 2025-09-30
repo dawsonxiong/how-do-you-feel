@@ -29,7 +29,7 @@ export default function SignInPage() {
           <div className="flex items-center justify-center mb-4">
             <Heart className="w-12 h-12 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold">welcome back</CardTitle>
+          <CardTitle className="text-2xl">welcome back</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {providers &&

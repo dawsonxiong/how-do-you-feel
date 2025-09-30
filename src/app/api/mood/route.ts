@@ -49,61 +49,130 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get mood entries for the authenticated user only
+    // Get users whose mood data I can view
+    const sharedUsers = await prisma.moodShare.findMany({
+      where: {
+        toUserId: session.user.id,
+      },
+      select: {
+        fromUserId: true,
+        fromUser: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    })
+
+    const sharedUserIds = sharedUsers.map((share) => share.fromUserId)
+    const allUserIds = [session.user.id, ...sharedUserIds]
+
+    // Get mood entries for the authenticated user AND users sharing with them
     const moodEntries = await prisma.moodEntry.findMany({
       where: {
-        userId: session.user.id,
+        userId: {
+          in: allUserIds,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
       },
       orderBy: {
         date: "asc",
       },
     })
 
-    // Group by date and calculate daily averages
-    interface DayData {
+    // Group by date AND user, then calculate daily averages per user
+    interface UserDayData {
       date: string
-      ratings: number[]
-      entries: Array<{
-        id: string
-        rating: number
-        date: Date
-        tags: string | null
-        notes: string | null
-        createdAt: Date
-        updatedAt: Date
-      }>
+      users: Record<
+        string,
+        {
+          userId: string
+          userName: string | null
+          userImage: string | null
+          ratings: number[]
+          entries: Array<{
+            id: string
+            rating: number
+            date: Date
+            tags: string | null
+            notes: string | null
+            createdAt: Date
+            updatedAt: Date
+          }>
+        }
+      >
     }
 
-    const dailyAverages = moodEntries.reduce(
-      (acc: Record<string, DayData>, entry: (typeof moodEntries)[0]) => {
+    const dailyData = moodEntries.reduce(
+      (acc: Record<string, UserDayData>, entry: (typeof moodEntries)[0]) => {
         const dateKey = format(entry.date, "yyyy-MM-dd")
 
         if (!acc[dateKey]) {
           acc[dateKey] = {
             date: dateKey,
+            users: {},
+          }
+        }
+
+        if (!acc[dateKey].users[entry.userId]) {
+          acc[dateKey].users[entry.userId] = {
+            userId: entry.userId,
+            userName: entry.user.name,
+            userImage: entry.user.image,
             ratings: [],
             entries: [],
           }
         }
 
-        acc[dateKey].ratings.push(entry.rating)
-        acc[dateKey].entries.push(entry)
+        acc[dateKey].users[entry.userId].ratings.push(entry.rating)
+        acc[dateKey].users[entry.userId].entries.push({
+          id: entry.id,
+          rating: entry.rating,
+          date: entry.date,
+          tags: entry.tags,
+          notes: entry.notes,
+          createdAt: entry.createdAt,
+          updatedAt: entry.updatedAt,
+        })
 
         return acc
       },
-      {} as Record<string, DayData>
+      {} as Record<string, UserDayData>
     )
 
-    // Calculate averages for days with data
-    const dayData = (Object.values(dailyAverages) as DayData[]).map((day) => ({
-      date: day.date,
-      rating:
-        Math.round(
-          (day.ratings.reduce((sum: number, r: number) => sum + r, 0) / day.ratings.length) * 100
-        ) / 100,
-      entryCount: day.entries.length,
-      entries: day.entries,
-    }))
+    // Calculate averages for days with data, organized by user
+    const dayData = (Object.values(dailyData) as UserDayData[]).map((day) => {
+      const userDataArray = Object.values(day.users).map((userData) => ({
+        userId: userData.userId,
+        userName: userData.userName,
+        userImage: userData.userImage,
+        rating:
+          Math.round(
+            (userData.ratings.reduce((sum: number, r: number) => sum + r, 0) /
+              userData.ratings.length) *
+              100
+          ) / 100,
+        entryCount: userData.entries.length,
+        entries: userData.entries,
+      }))
+
+      return {
+        date: day.date,
+        users: userDataArray,
+      }
+    })
 
     // Create continuous time series based on actual data range
     let startDate: Date
@@ -135,18 +204,24 @@ export async function GET() {
       startDate.setDate(endDate.getDate() - 30)
     }
 
-    // For now, just return the actual data points (no gaps)
-    // This avoids chart rendering issues with null values
+    // Sort by date and return with metadata
     const sortedData = dayData.sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     )
 
-    return NextResponse.json(
-      sortedData.map((item) => ({
-        ...item,
-        hasData: true,
-      }))
-    )
+    // Get user info for all shared users
+    const sharedUsersInfo = sharedUsers.map((share) => ({
+      id: share.fromUser.id,
+      name: share.fromUser.name,
+      email: share.fromUser.email,
+      image: share.fromUser.image,
+    }))
+
+    return NextResponse.json({
+      data: sortedData,
+      currentUserId: session.user.id,
+      sharedUsers: sharedUsersInfo,
+    })
   } catch (error) {
     console.error("Error fetching mood entries:", error)
     return NextResponse.json({ error: "Failed to fetch mood entries" }, { status: 500 })

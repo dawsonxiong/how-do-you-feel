@@ -1,11 +1,12 @@
 "use client"
 
 import { format, parseISO } from "date-fns"
-import { Calendar, TrendingUp } from "lucide-react"
+import { Calendar, Eye, EyeOff, TrendingUp } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import {
   CartesianGrid,
+  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -15,11 +16,12 @@ import {
 } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-interface MoodData {
-  date: string
+interface UserMoodEntry {
+  userId: string
+  userName: string | null
+  userImage: string | null
   rating: number
   entryCount: number
-  hasData: boolean
   entries: Array<{
     id: string
     rating: number
@@ -31,69 +33,72 @@ interface MoodData {
   }>
 }
 
+interface DayData {
+  date: string
+  users: UserMoodEntry[]
+}
+
+interface SharedUser {
+  id: string
+  name: string | null
+  email: string
+  image: string | null
+}
+
+interface MoodData {
+  data: DayData[]
+  currentUserId: string
+  sharedUsers: SharedUser[]
+}
+
 interface MoodChartProps {
   refreshTrigger?: number
 }
+
+// Color palette for different users
+const USER_COLORS = [
+  "#000000", // Black for primary user (dark mode: white)
+  "#3b82f6", // Blue
+  "#ef4444", // Red
+  "#10b981", // Green
+  "#f59e0b", // Amber
+  "#8b5cf6", // Purple
+  "#ec4899", // Pink
+]
 
 const CustomTooltip = ({
   active,
   payload,
   label,
+  currentUserId,
 }: {
   active?: boolean
   payload?: Array<{
-    payload: MoodData
+    dataKey: string
     value: number
+    name: string
+    color: string
   }>
   label?: string
+  currentUserId: string
 }) => {
   if (active && payload && payload.length) {
-    const data = payload[0].payload
-
-    // All data points should have data now
-
-    const hasMultipleEntries = data.entryCount > 1
-
     return (
       <div className="bg-background border rounded-lg p-3 shadow-md max-w-xs">
-        <p className="font-medium text-sm">{format(parseISO(label || ""), "MMM dd, yyyy")}</p>
-        <p className="text-primary">
-          <span className="font-medium text-sm">
-            {hasMultipleEntries ? `Average: ${payload[0].value}` : `mood: ${payload[0].value}`}
-          </span>
-          <span className="text-muted-foreground ml-2 text-sm">
-            ({data.entryCount} {data.entryCount === 1 ? "entry" : "entries"})
-          </span>
-        </p>
-
-        {/* Show details for multiple entries */}
-        {hasMultipleEntries ? (
-          <div className="mt-2 space-y-1">
-            {data.entries.map((entry) => (
-              <div key={entry.id} className="text-xs border-l-2 border-muted pl-2">
-                <span className="font-medium text-primary">{entry.rating}</span>
-                {entry.tags && (
-                  <span className="text-muted-foreground ml-2">
-                    #{entry.tags.replace(/,/g, " #")}
-                  </span>
+        <p className="font-medium text-sm mb-2">{format(parseISO(label || ""), "MMM dd, yyyy")}</p>
+        <div className="space-y-2">
+          {payload.map((entry) => (
+            <div key={entry.dataKey} className="border-l-2 pl-2" style={{ borderColor: entry.color }}>
+              <p className="text-sm">
+                <span className="font-medium">{entry.name}</span>
+                {entry.dataKey.replace("user_", "") === currentUserId && (
+                  <span className="text-xs text-muted-foreground ml-1">(you)</span>
                 )}
-                {entry.notes && <p className="text-muted-foreground mt-0.5">"{entry.notes}"</p>}
-              </div>
-            ))}
-          </div>
-        ) : (
-          // Single entry details
-          <div className="mt-2">
-            {data.entries[0]?.tags && (
-              <p className="text-xs text-muted-foreground">
-                #{data.entries[0].tags.replace(/,/g, " #")}
               </p>
-            )}
-            {data.entries[0]?.notes && (
-              <p className="text-sm text-muted-foreground mt-1">"{data.entries[0].notes}"</p>
-            )}
-          </div>
-        )}
+              <p className="text-primary font-medium">{entry.value}/10</p>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -101,20 +106,23 @@ const CustomTooltip = ({
 }
 
 export function MoodChart({ refreshTrigger }: MoodChartProps) {
-  const [data, setData] = useState<MoodData[]>([])
+  const [moodData, setMoodData] = useState<MoodData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+  const [visibleUsers, setVisibleUsers] = useState<Set<string>>(new Set())
   const { theme } = useTheme()
-
-  // Get line color based on theme
-  const lineColor = theme === "dark" ? "#ffffff" : "#000000"
 
   const fetchMoodData = async () => {
     try {
       const response = await fetch("/api/mood")
       if (response.ok) {
-        const moodData = await response.json()
-        setData(moodData)
+        const data: MoodData = await response.json()
+        setMoodData(data)
+        
+        // Initialize all users as visible
+        const allUserIds = new Set<string>([data.currentUserId])
+        data.sharedUsers.forEach((user) => allUserIds.add(user.id))
+        setVisibleUsers(allUserIds)
       }
     } catch (error) {
       console.error("Error fetching mood data:", error)
@@ -128,7 +136,6 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   }, [refreshTrigger])
 
   useEffect(() => {
-    // Check mobile on mount and resize
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
     }
@@ -139,75 +146,90 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
+  const toggleUserVisibility = (userId: string) => {
+    setVisibleUsers((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(userId)) {
+        newSet.delete(userId)
+      } else {
+        newSet.add(userId)
+      }
+      return newSet
+    })
+  }
+
   const formatXAxisLabel = (tickItem: string) => {
     try {
       const date = parseISO(tickItem)
-      const totalDays = data.length
+      const totalDays = moodData?.data.length || 0
 
-      // Industry standard: Format based on total data range (like Apple Health)
       if (totalDays <= 7) {
-        // 1 Week: Show day names
-        return format(date, "EEE") // "Mon", "Tue", "Wed"
+        return format(date, "EEE")
       }
 
       if (totalDays <= 30) {
-        // 1 Month: Show month + day for context
-        return format(date, isMobile ? "M/d" : "MMM d") // "9/15" or "Sep 15"
+        return format(date, isMobile ? "M/d" : "MMM d")
       }
 
       if (totalDays <= 90) {
-        // 3 Months: Show month + day for key dates
-        return format(date, isMobile ? "M/d" : "MMM d") // "9/15" or "Sep 15"
+        return format(date, isMobile ? "M/d" : "MMM d")
       }
 
-      // 3+ Months: Show month names only (like Apple Health yearly view)
-      return format(date, "MMM") // "Sep", "Oct", "Nov"
+      return format(date, "MMM")
     } catch {
       return tickItem
     }
   }
 
   const getTickInterval = () => {
-    const totalDays = data.length
+    const totalDays = moodData?.data.length || 0
 
     if (isMobile) {
-      // Mobile: Industry standard - fewer labels for readability
-      if (totalDays <= 7) return 0 // 1 Week: Show all days
-      if (totalDays <= 30) return 4 // 1 Month: Every 5th day (like "1", "5", "10", "15")
-      return Math.max(6, Math.floor(totalDays / 4)) // Longer: ~4 labels max
+      if (totalDays <= 7) return 0
+      if (totalDays <= 30) return 4
+      return Math.max(6, Math.floor(totalDays / 4))
     }
 
-    // Desktop: Industry standard intervals
-    if (totalDays <= 7) return 0 // 1 Week: Show all days (Mon, Tue, Wed...)
-    if (totalDays <= 14) return 1 // 2 Weeks: Every other day
-    if (totalDays <= 30) return 4 // 1 Month: Every 5th day (1, 6, 11, 16, 21, 26)
-    if (totalDays <= 90) return 6 // 3 Months: Every 7th day (weekly markers)
-    return 10 // 3+ Months: Every ~11th day for monthly markers
+    if (totalDays <= 7) return 0
+    if (totalDays <= 14) return 1
+    if (totalDays <= 30) return 4
+    if (totalDays <= 90) return 6
+    return 10
   }
 
-  const getAverageRating = () => {
-    if (data.length === 0) return 0
-    return (
-      Math.round((data.reduce((sum, entry) => sum + entry.rating, 0) / data.length) * 100) / 100
-    )
-  }
+  // Transform data for recharts
+  const chartData = moodData?.data.map((day) => {
+    const dayEntry: Record<string, string | number> = { date: day.date }
+    
+    day.users.forEach((user) => {
+      dayEntry[`user_${user.userId}`] = user.rating
+    })
+    
+    return dayEntry
+  }) || []
 
-  const getRecentTrend = () => {
-    if (data.length < 4) return null
+  // Get all unique users from the data
+  const allUsers = moodData
+    ? [
+        {
+          id: moodData.currentUserId,
+          name: "You",
+          isCurrentUser: true,
+        },
+        ...moodData.sharedUsers.map((user) => ({
+          id: user.id,
+          name: user.name || user.email,
+          isCurrentUser: false,
+        })),
+      ]
+    : []
 
-    const recent = data.slice(-10) // Last 10 entries
-    if (recent.length < 4) return null
-
-    const firstHalf = recent.slice(0, Math.floor(recent.length / 2))
-    const secondHalf = recent.slice(Math.floor(recent.length / 2))
-
-    const firstAvg = firstHalf.reduce((sum, entry) => sum + entry.rating, 0) / firstHalf.length
-    const secondAvg = secondHalf.reduce((sum, entry) => sum + entry.rating, 0) / secondHalf.length
-
-    const difference = secondAvg - firstAvg
-
-    if (Math.abs(difference) < 0.1) return "stable"
-    return difference > 0 ? "improving" : "declining"
+  const getUserColor = (userId: string, isCurrentUser: boolean) => {
+    if (isCurrentUser) {
+      return theme === "dark" ? "#ffffff" : "#000000"
+    }
+    const index = allUsers.findIndex((u) => u.id === userId)
+    return USER_COLORS[index % USER_COLORS.length]
   }
 
   if (isLoading) {
@@ -228,7 +250,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
     )
   }
 
-  if (data.length === 0) {
+  if (!moodData || chartData.length === 0) {
     return (
       <Card className="w-full h-full">
         <CardHeader>
@@ -249,9 +271,6 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
     )
   }
 
-  const trend = getRecentTrend()
-  const averageRating = getAverageRating()
-
   return (
     <Card className="w-full h-full">
       <CardHeader>
@@ -259,27 +278,43 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
           <TrendingUp className="w-5 h-5" />
           history
         </CardTitle>
-        <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-          <span>average: {averageRating}/10</span>
-          {trend && (
-            <>
-              <span>|</span>
-              <span
-                className={`font-medium ${
-                  trend === "improving"
-                    ? "text-green-600"
-                    : trend === "declining"
-                      ? "text-red-600"
-                      : "text-blue-600"
-                }`}
-              >
-                recent trend: {trend}
-              </span>
-            </>
-          )}
-          <span>|</span>
+        
+        {/* User toggles */}
+        {allUsers.length > 1 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {allUsers.map((user) => {
+              const isVisible = visibleUsers.has(user.id)
+              const color = getUserColor(user.id, user.isCurrentUser)
+              
+              return (
+                <button
+                  key={user.id}
+                  type="button"
+                  onClick={() => toggleUserVisibility(user.id)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all text-sm"
+                  style={{
+                    borderColor: isVisible ? color : "transparent",
+                    backgroundColor: isVisible ? `${color}10` : "transparent",
+                    opacity: isVisible ? 1 : 0.5,
+                  }}
+                >
+                  {isVisible ? (
+                    <Eye className="w-3.5 h-3.5" style={{ color }} />
+                  ) : (
+                    <EyeOff className="w-3.5 h-3.5" />
+                  )}
+                  <span style={{ color: isVisible ? color : "inherit" }}>
+                    {user.name}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+        
+        <div className="flex flex-wrap gap-2 text-sm text-muted-foreground mt-2">
           <span>
-            {data.length} {data.length === 1 ? "day" : "days"} tracked
+            {chartData.length} {chartData.length === 1 ? "day" : "days"} tracked
           </span>
         </div>
       </CardHeader>
@@ -287,7 +322,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
         <div className={`w-full ${isMobile ? "h-80" : "h-64"}`}>
           <ResponsiveContainer width="100%" height="100%" style={{ outline: "none" }}>
             <LineChart
-              data={data}
+              data={chartData}
               style={{
                 outline: "none",
                 border: "none",
@@ -313,7 +348,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
               />
               <YAxis domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} className="text-xs" />
               <Tooltip
-                content={<CustomTooltip />}
+                content={<CustomTooltip currentUserId={moodData.currentUserId} />}
                 allowEscapeViewBox={{ x: false, y: true }}
                 cursor={false}
                 wrapperStyle={{
@@ -322,25 +357,37 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                   border: "none",
                 }}
               />
-              <Line
-                type="linear"
-                dataKey="rating"
-                stroke={lineColor}
-                strokeWidth={2}
-                dot={{ fill: lineColor, strokeWidth: 1, r: 3 }}
-                activeDot={{
-                  r: 3,
-                  stroke: lineColor,
-                  strokeWidth: 2,
-                  fill: lineColor,
-                  style: { pointerEvents: "none" },
-                }}
-                connectNulls={false}
-                animationBegin={0}
-                animationDuration={1500}
-                animationEasing="ease-out"
-                isAnimationActive={true}
-              />
+              
+              {/* Render a line for each user */}
+              {allUsers.map((user) => {
+                if (!visibleUsers.has(user.id)) return null
+                
+                const color = getUserColor(user.id, user.isCurrentUser)
+                
+                return (
+                  <Line
+                    key={user.id}
+                    type="linear"
+                    dataKey={`user_${user.id}`}
+                    name={user.name}
+                    stroke={color}
+                    strokeWidth={2}
+                    dot={{ fill: color, strokeWidth: 1, r: 3 }}
+                    activeDot={{
+                      r: 4,
+                      stroke: color,
+                      strokeWidth: 2,
+                      fill: color,
+                      style: { pointerEvents: "none" },
+                    }}
+                    connectNulls={false}
+                    animationBegin={0}
+                    animationDuration={1500}
+                    animationEasing="ease-out"
+                    isAnimationActive={true}
+                  />
+                )
+              })}
             </LineChart>
           </ResponsiveContainer>
         </div>
