@@ -57,7 +57,7 @@ interface MoodChartProps {
 
 // Color palette for different users
 const USER_COLORS = [
-  "#000000", // Black for primary user (dark mode: white)
+  "#000000", // Black for primary user
   "#3b82f6", // Blue
   "#ef4444", // Red
   "#10b981", // Green

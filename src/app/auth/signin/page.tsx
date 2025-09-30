@@ -62,7 +62,7 @@ export default function SignInPage() {
               </Button>
             ))}
 
-          <div className="text-center pt-4">
+          <div className="text-center pt-2">
             <p className="text-sm text-muted-foreground">
               by signing in, you agree to our "privacy policy"
             </p>

@@ -2,6 +2,7 @@
 
 import { LogOut, Moon, Settings, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
+import { signOut } from "next-auth/react"
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,13 +22,8 @@ export function SettingsButton() {
     setMounted(true)
   }, [])
 
-  const handleSignOut = () => {
-    // Create a form and submit it to sign out
-    const form = document.createElement("form")
-    form.method = "post"
-    form.action = "/api/auth/signout"
-    document.body.appendChild(form)
-    form.submit()
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/auth/signin" })
   }
 
   const handleThemeToggle = () => {

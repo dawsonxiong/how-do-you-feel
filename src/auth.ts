@@ -29,6 +29,13 @@ export const config = {
         id: user.id,
       },
     }),
+    signIn: async ({ user, account, profile }) => {
+      // Prevent linking different email accounts to same user
+      if (user.email && profile?.email && user.email !== profile.email) {
+        return false
+      }
+      return true
+    },
   },
   session: {
     strategy: "database",
