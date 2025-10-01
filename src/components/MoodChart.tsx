@@ -6,7 +6,6 @@ import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -57,13 +56,13 @@ interface MoodChartProps {
 
 // Color palette for different users
 const USER_COLORS = [
-  "#000000", // Black for primary user
-  "#3b82f6", // Blue
-  "#ef4444", // Red
-  "#10b981", // Green
+  "#000000", // Black for first user (white in dark mode)
+  "#6366f1", // Indigo for second user
   "#f59e0b", // Amber
-  "#8b5cf6", // Purple
   "#ec4899", // Pink
+  "#14b8a6", // Teal
+  "#8b5cf6", // Purple
+  "#06b6d4", // Cyan
 ]
 
 const CustomTooltip = ({
@@ -91,9 +90,6 @@ const CustomTooltip = ({
             <div key={entry.dataKey} className="border-l-2 pl-2" style={{ borderColor: entry.color }}>
               <p className="text-sm">
                 <span className="font-medium">{entry.name}</span>
-                {entry.dataKey.replace("user_", "") === currentUserId && (
-                  <span className="text-xs text-muted-foreground ml-1">(you)</span>
-                )}
               </p>
               <p className="text-sm font-medium">{entry.value}/10</p>
             </div>
@@ -291,19 +287,19 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                   key={user.id}
                   type="button"
                   onClick={() => toggleUserVisibility(user.id)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all text-sm"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-200 text-sm"
                   style={{
-                    borderColor: isVisible ? color : "transparent",
+                    borderColor: isVisible ? color : "var(--border)",
                     backgroundColor: isVisible ? `${color}10` : "transparent",
-                    opacity: isVisible ? 1 : 0.5,
+                    opacity: isVisible ? 1 : 0.6,
                   }}
                 >
                   {isVisible ? (
-                    <Eye className="w-3.5 h-3.5" style={{ color }} />
+                    <Eye className="w-3.5 h-3.5 transition-transform" style={{ color }} />
                   ) : (
-                    <EyeOff className="w-3.5 h-3.5" />
+                    <EyeOff className="w-3.5 h-3.5 transition-transform" />
                   )}
-                  <span style={{ color: isVisible ? color : "inherit" }}>
+                  <span className="font-medium" style={{ color: isVisible ? color : "inherit" }}>
                     {user.name}
                   </span>
                 </button>
@@ -367,7 +363,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                 return (
                   <Line
                     key={user.id}
-                    type="linear"
+                    type="monotone"
                     dataKey={`user_${user.id}`}
                     name={user.name}
                     stroke={color}
@@ -380,7 +376,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                       fill: color,
                       style: { pointerEvents: "none" },
                     }}
-                    connectNulls={false}
+                    connectNulls={true}
                     animationBegin={0}
                     animationDuration={1500}
                     animationEasing="ease-out"

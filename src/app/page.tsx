@@ -18,33 +18,23 @@ export default function Home() {
     <AuthGuard>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:!bg-black dark:!bg-none">
         <div className="container mx-auto px-6 py-8 max-w-5xl">
-          {/* Header with User Profile */}
+          {/* Header */}
           <header className="flex justify-end mb-8">
             <UserProfile />
           </header>
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch lg:mt-20 mt-4">
-            {/* Mood Entry Form */}
-            <div className="order-1 lg:order-1">
-              <MoodEntryForm onSuccess={handleMoodEntrySuccess} />
-            </div>
-
-            {/* Mood Chart */}
-            <div className="order-2 lg:order-2">
-              <MoodChart refreshTrigger={refreshTrigger} />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+            <MoodEntryForm onSuccess={handleMoodEntrySuccess} />
+            <MoodChart refreshTrigger={refreshTrigger} />
           </div>
+
           {/* Footer */}
-          <footer className="mt-8 text-muted-foreground">
-            <div className="flex items-center justify-between w-full mx-auto">
-              <div />
-              <div className="flex-1 flex justify-center">
-                <p className="text-sm text-center">for j</p>
-              </div>
-              <div>
-                <SettingsButton />
-              </div>
+          <footer className="mt-8 flex items-center justify-between text-muted-foreground">
+            <div className="flex-1" />
+            <p className="text-sm">for j</p>
+            <div className="flex-1 flex justify-end">
+              <SettingsButton />
             </div>
           </footer>
         </div>

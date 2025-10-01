@@ -1,8 +1,8 @@
 "use client"
 
 import { LogOut, Moon, Settings, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
 import { signOut } from "next-auth/react"
+import { useTheme } from "next-themes"
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {

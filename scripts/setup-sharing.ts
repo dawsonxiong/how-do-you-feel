@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   console.log("Fetching all users...")
-  
+
   const users = await prisma.user.findMany({
     select: {
       id: true,
@@ -19,7 +19,9 @@ async function main() {
   })
 
   if (users.length < 2) {
-    console.log("\n⚠️  Need at least 2 users to set up sharing. Please sign in with both accounts first.")
+    console.log(
+      "\n⚠️  Need at least 2 users to set up sharing. Please sign in with both accounts first."
+    )
     return
   }
 
