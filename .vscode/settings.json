@@ -1,0 +1,5 @@
+{
+  "biome.enabled": true,
+  "biome.executable": "${workspaceFolder}/node_modules/.bin/biome"
+}
+

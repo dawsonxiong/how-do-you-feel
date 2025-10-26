@@ -16,15 +16,15 @@ export default function Home() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:!bg-black dark:!bg-none">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 dark:bg-black! dark:bg-none!">
         <div className="container mx-auto px-6 py-8 max-w-5xl">
-          {/* Header */}
+          {/* Header
           <header className="flex justify-end mb-8">
             <UserProfile />
-          </header>
+          </header> */}
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch lg:mt-12">
             <MoodEntryForm onSuccess={handleMoodEntrySuccess} />
             <MoodChart refreshTrigger={refreshTrigger} />
           </div>
