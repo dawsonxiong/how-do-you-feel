@@ -1,11 +1,11 @@
 {
   "name": "How Do You Feel?",
   "short_name": "Mood Tracker",
-  "description": "Track your daily mood and emotions. Discover patterns in your mental wellbeing with beautiful visualizations.",
+  "description": "Track your daily mood and emotions. Discover patterns in your mental wellbeing with beautiful visualizations. Now with iOS Shortcuts integration!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#3b82f6",
+  "theme_color": "#6366f1",
   "orientation": "portrait-primary",
   "categories": ["health", "lifestyle", "productivity"],
   "lang": "en",
@@ -15,6 +15,20 @@
       "src": "/favicon.ico",
       "sizes": "64x64",
       "type": "image/x-icon"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Log Mood",
+      "short_name": "Log",
+      "description": "Quickly log your current mood",
+      "url": "/?action=log",
+      "icons": [
+        {
+          "src": "/favicon.ico",
+          "sizes": "64x64"
+        }
+      ]
     }
   ]
 }

@@ -56,13 +56,13 @@ interface MoodChartProps {
 
 // Color palette for different users
 const USER_COLORS = [
-  "#000000", // Black for first user (white in dark mode)
-  "#6366f1", // Indigo for second user
-  "#f59e0b", // Amber
-  "#ec4899", // Pink
-  "#14b8a6", // Teal
-  "#8b5cf6", // Purple
-  "#06b6d4", // Cyan
+  "#a855f7", // Fuchsia-purple
+  "#8b5cf6", // Violet
+  "#9333ea", // Purple
+  "#6366f1", // Indigo
+  "#3b82f6", // Blue  
+  "#0ea5e9", // Sky blue
+  "#7c3aed", // Violet-purple
 ]
 
 const CustomTooltip = ({
@@ -222,7 +222,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
 
   const getUserColor = (userId: string, isCurrentUser: boolean) => {
     if (isCurrentUser) {
-      return theme === "dark" ? "#ffffff" : "#000000"
+      return theme === "dark" ? "#c4b5fd" : "#6366f1" // Lighter purple in dark mode, indigo in light mode
     }
     const index = allUsers.findIndex((u) => u.id === userId)
     return USER_COLORS[index % USER_COLORS.length]
@@ -318,6 +318,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
         <div className={`w-full ${isMobile ? "h-80" : "h-64"}`}>
           <ResponsiveContainer width="100%" height="100%" style={{ outline: "none" }}>
             <LineChart
+              key={Array.from(visibleUsers).sort().join(",")}
               data={chartData}
               style={{
                 outline: "none",
