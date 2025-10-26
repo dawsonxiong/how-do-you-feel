@@ -82,12 +82,12 @@ export function MobileSetupDialog({ open, onOpenChange }: MobileSetupDialogProps
             <Smartphone className="h-5 w-5" />
             shortcuts & widget setup
           </DialogTitle>
-          <DialogDescription>use apple shortcuts to log your mood with ease</DialogDescription>
+          {/* <DialogDescription>use apple shortcuts to log your mood with ease</DialogDescription> */}
         </DialogHeader>
- 
-        <div className="space-y-6 py-2">
+
+        <div className="space-y-6 pb-2">
           {/* API Token Section */}
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <h3 className="text-sm font-medium">your api token</h3>
             <div className="flex gap-2">
               <div className="flex-1 font-mono text-sm bg-muted p-3 rounded-md overflow-hidden">
@@ -106,7 +106,7 @@ export function MobileSetupDialog({ open, onOpenChange }: MobileSetupDialogProps
                 {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </Button>
             </div>
- 
+
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -126,20 +126,26 @@ export function MobileSetupDialog({ open, onOpenChange }: MobileSetupDialogProps
                   </>
                 )}
               </Button>
-              {/* <Button
+              <Button
                 variant="outline"
                 onClick={handleRegenerateToken}
                 disabled={regenerating}
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${regenerating ? "animate-spin" : ""}`} />
                 Regenerate
-              </Button> */}
+              </Button>
             </div>
-          </div>
+          </div> */}
 
           {/* Instructions */}
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">shortcuts setup</h3>
+            <h3 className="text-sm font-medium mt-2">widget setup</h3>
+            <ol className="text-sm space-y-2 list-decimal list-inside text-muted-foreground">
+              <li>press the share button</li>
+              <li>select 'Add to Home Screen'</li>
+            </ol>
+
+            <h3 className="text-sm font-medium mt-4">shortcuts setup</h3>
             <ol className="text-sm space-y-2 list-decimal list-inside text-muted-foreground">
               <li>copy your api token</li>
               <li>open shortcuts</li>
@@ -147,8 +153,8 @@ export function MobileSetupDialog({ open, onOpenChange }: MobileSetupDialogProps
                 create a new shortcut
                 <ul className="ml-6 mt-1 space-y-1 list-disc list-inside">
                   <li>search for 'Ask for Input', make the input a Number</li>
-                  <li>search for 'Get contents of URL', paste the following</li>
-                  <div className="bg-muted p-3 rounded-md space-y-2 relative">
+                  <li>search for 'Get contents of URL', copy and paste the following</li>
+                  <div className="bg-muted p-2 rounded-md relative">
                     <code className="text-xs break-all block pr-8">
                       {typeof window !== "undefined"
                         ? `${window.location.origin}/api/shortcuts/submit?token=YOUR_TOKEN&rating=`
@@ -162,14 +168,9 @@ export function MobileSetupDialog({ open, onOpenChange }: MobileSetupDialogProps
                       disabled={!apiToken}
                       title="Copy URL with your token"
                     >
-                      {urlCopied ? (
-                        <Check className="h-3 w-3" />
-                      ) : (
-                        <Copy className="h-3 w-3" />
-                      )}
+                      {urlCopied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                     </Button>
                   </div>
-                  <li>replace YOUR_TOKEN with your api token</li>
                   <li>place your cursor at the end of the URL</li>
                   <li>press 'Select Variable', and choose 'Ask for Input'</li>
                   <li>search for 'Show content'</li>
@@ -177,15 +178,9 @@ export function MobileSetupDialog({ open, onOpenChange }: MobileSetupDialogProps
               </li>
               <li>add shortcut to home screen or action button</li>
             </ol>
-            <h3 className="text-sm font-medium mt-4">widget setup</h3>
-            <ol className="text-sm space-y-2 list-decimal list-inside text-muted-foreground">
-                <li>press the share button</li>
-                <li>select 'Add to Home Screen'</li>
-            </ol>
           </div>
         </div>
       </DialogContent>
     </Dialog>
   )
 }
-

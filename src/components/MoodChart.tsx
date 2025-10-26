@@ -60,7 +60,7 @@ const USER_COLORS = [
   "#8b5cf6", // Violet
   "#9333ea", // Purple
   "#6366f1", // Indigo
-  "#3b82f6", // Blue  
+  "#3b82f6", // Blue
   "#0ea5e9", // Sky blue
   "#7c3aed", // Violet-purple
 ]
@@ -69,7 +69,6 @@ const CustomTooltip = ({
   active,
   payload,
   label,
-  currentUserId,
 }: {
   active?: boolean
   payload?: Array<{
@@ -79,7 +78,6 @@ const CustomTooltip = ({
     color: string
   }>
   label?: string
-  currentUserId: string
 }) => {
   if (active && payload && payload.length) {
     return (
@@ -87,7 +85,11 @@ const CustomTooltip = ({
         <p className="font-medium text-sm mb-2">{format(parseISO(label || ""), "MMM dd, yyyy")}</p>
         <div className="space-y-2">
           {payload.map((entry) => (
-            <div key={entry.dataKey} className="border-l-2 pl-2" style={{ borderColor: entry.color }}>
+            <div
+              key={entry.dataKey}
+              className="border-l-2 pl-2"
+              style={{ borderColor: entry.color }}
+            >
               <p className="text-sm">
                 <span className="font-medium">{entry.name}</span>
               </p>
@@ -114,10 +116,12 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
       if (response.ok) {
         const data: MoodData = await response.json()
         setMoodData(data)
-        
+
         // Initialize all users as visible
         const allUserIds = new Set<string>([data.currentUserId])
-        data.sharedUsers.forEach((user) => allUserIds.add(user.id))
+        for (const user of data.sharedUsers) {
+          allUserIds.add(user.id)
+        }
         setVisibleUsers(allUserIds)
       }
     } catch (error) {
@@ -194,15 +198,16 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
   }
 
   // Transform data for recharts
-  const chartData = moodData?.data.map((day) => {
-    const dayEntry: Record<string, string | number> = { date: day.date }
-    
-    day.users.forEach((user) => {
-      dayEntry[`user_${user.userId}`] = user.rating
-    })
-    
-    return dayEntry
-  }) || []
+  const chartData =
+    moodData?.data.map((day) => {
+      const dayEntry: Record<string, string | number> = { date: day.date }
+
+      day.users.forEach((user) => {
+        dayEntry[`user_${user.userId}`] = user.rating
+      })
+
+      return dayEntry
+    }) || []
 
   // Get all unique users from the data
   const allUsers = moodData
@@ -258,9 +263,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
         <CardContent>
           <div className="h-64 flex flex-col items-center justify-center text-center">
             <Calendar className="w-12 h-12 text-muted-foreground mb-4" />
-            <div className="text-muted-foreground">
-              no mood entries yet.
-            </div>
+            <div className="text-muted-foreground">no mood entries yet.</div>
           </div>
         </CardContent>
       </Card>
@@ -274,14 +277,14 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
           <TrendingUp className="w-5 h-5" />
           history
         </CardTitle>
-        
+
         {/* User toggles */}
         {allUsers.length > 1 && (
           <div className="flex flex-wrap gap-2 mt-3">
             {allUsers.map((user) => {
               const isVisible = visibleUsers.has(user.id)
               const color = getUserColor(user.id, user.isCurrentUser)
-              
+
               return (
                 <button
                   key={user.id}
@@ -307,7 +310,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
             })}
           </div>
         )}
-        
+
         <div className="flex flex-wrap gap-2 text-sm text-muted-foreground mt-2">
           <span>
             {chartData.length} {chartData.length === 1 ? "day" : "days"} tracked
@@ -345,7 +348,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
               />
               <YAxis domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} className="text-xs" />
               <Tooltip
-                content={<CustomTooltip currentUserId={moodData.currentUserId} />}
+                content={<CustomTooltip />}
                 allowEscapeViewBox={{ x: false, y: true }}
                 cursor={false}
                 wrapperStyle={{
@@ -354,13 +357,13 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
                   border: "none",
                 }}
               />
-              
+
               {/* Render a line for each user */}
               {allUsers.map((user) => {
                 if (!visibleUsers.has(user.id)) return null
-                
+
                 const color = getUserColor(user.id, user.isCurrentUser)
-                
+
                 return (
                   <Line
                     key={user.id}

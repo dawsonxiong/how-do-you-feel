@@ -29,7 +29,7 @@ export const config = {
         id: user.id,
       },
     }),
-    signIn: async ({ user, account, profile }) => {
+    signIn: async ({ user, profile }) => {
       // Prevent linking different email accounts to same user
       if (user.email && profile?.email && user.email !== profile.email) {
         return false

@@ -16,13 +16,12 @@ export async function DELETE() {
       },
     })
 
-    return NextResponse.json({ 
-      success: true, 
-      deletedCount: result.count 
+    return NextResponse.json({
+      success: true,
+      deletedCount: result.count,
     })
   } catch (error) {
     console.error("Error resetting mood entries:", error)
     return NextResponse.json({ error: "Failed to reset mood entries" }, { status: 500 })
   }
 }
-

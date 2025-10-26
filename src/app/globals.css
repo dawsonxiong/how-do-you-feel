@@ -200,18 +200,18 @@ svg *,
 .recharts-cartesian-grid,
 .recharts-line,
 .recharts-dot {
-  outline: none !important;
-  border: none !important;
+  outline: none;
+  border: none;
 }
 
 svg:focus,
 svg *:focus {
-  outline: none !important;
-  border: none !important;
+  outline: none;
+  border: none;
 }
 
 /* Dark mode input overrides */
 .dark input[type="text"] {
-  background-color: #000000 !important;
-  color: white !important;
+  background-color: #000000;
+  color: white;
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { Check, Heart } from "lucide-react"
-import { useState } from "react"
+import { useId, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -26,6 +26,8 @@ const moodLabels = {
 }
 
 export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
+  const tagsId = useId()
+  const notesId = useId()
   const [rating, setRating] = useState([5])
   const [tags, setTags] = useState("")
   const [notes, setNotes] = useState("")
@@ -111,13 +113,13 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
           <div className="space-y-4">
             <div>
               <label
-                htmlFor="tags"
+                htmlFor={tagsId}
                 className="block text-sm font-medium mb-2 text-gray-600 dark:text-gray-300"
               >
                 tags <span className="text-xs font-normal">(optional)</span>
               </label>
               <Input
-                id="tags"
+                id={tagsId}
                 type="text"
                 placeholder="work, friends, family..."
                 value={tags}
@@ -127,13 +129,13 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
 
             <div>
               <label
-                htmlFor="notes"
+                htmlFor={notesId}
                 className="block text-sm font-medium mb-2 text-gray-600 dark:text-gray-300"
               >
                 notes <span className="text-xs font-normal">(optional)</span>
               </label>
               <Input
-                id="notes"
+                id={notesId}
                 type="text"
                 placeholder="what's affecting your mood today?"
                 value={notes}

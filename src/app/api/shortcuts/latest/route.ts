@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server"
 import { formatDistanceToNow } from "date-fns"
+import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
 const moodLabels: Record<number, string> = {
@@ -68,13 +68,13 @@ export async function GET(request: Request) {
 
     const label = getMoodLabel(latestEntry.rating)
     const timeAgo = formatDistanceToNow(latestEntry.updatedAt, { addSuffix: true })
-    
+
     let response = `${latestEntry.rating.toFixed(1)} - ${label}\nLogged ${timeAgo}`
-    
+
     if (latestEntry.tags) {
       response += `\nTags: ${latestEntry.tags}`
     }
-    
+
     if (latestEntry.notes) {
       response += `\nNotes: ${latestEntry.notes}`
     }
@@ -91,4 +91,3 @@ export async function GET(request: Request) {
     })
   }
 }
-

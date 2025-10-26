@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server"
 import { startOfDay } from "date-fns"
+import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
 const moodLabels: Record<number, string> = {
@@ -79,11 +79,11 @@ export async function POST(request: Request) {
 
     const label = getMoodLabel(rating)
     let response = `✓ Mood logged: ${rating.toFixed(1)} - ${label}`
-    
+
     if (tags) {
       response += `\nTags: ${tags}`
     }
-    
+
     if (notes) {
       response += `\nNotes: ${notes}`
     }
@@ -105,4 +105,3 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   return POST(request)
 }
-

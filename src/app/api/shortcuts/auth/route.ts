@@ -28,10 +28,7 @@ export async function GET() {
     return NextResponse.json({ token: user.apiToken })
   } catch (error) {
     console.error("Error getting API token:", error)
-    return NextResponse.json(
-      { error: "Failed to get API token" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to get API token" }, { status: 500 })
   }
 }
 
@@ -53,10 +50,6 @@ export async function POST() {
     return NextResponse.json({ token: user.apiToken })
   } catch (error) {
     console.error("Error regenerating API token:", error)
-    return NextResponse.json(
-      { error: "Failed to regenerate API token" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to regenerate API token" }, { status: 500 })
   }
 }
-

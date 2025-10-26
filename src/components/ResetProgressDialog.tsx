@@ -25,7 +25,7 @@ export function ResetProgressDialog({ open, onOpenChange }: ResetProgressDialogP
       const response = await fetch("/api/mood/reset", {
         method: "DELETE",
       })
-      
+
       if (response.ok) {
         // Refresh the page to update the chart
         window.location.reload()
@@ -54,20 +54,12 @@ export function ResetProgressDialog({ open, onOpenChange }: ResetProgressDialogP
             this will permanently delete all your mood entries. this action cannot be undone.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="flex gap-3 justify-end pt-4">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isResetting}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isResetting}>
             cancel
           </Button>
-          <Button
-            variant="destructive"
-            onClick={handleResetProgress}
-            disabled={isResetting}
-          >
+          <Button variant="destructive" onClick={handleResetProgress} disabled={isResetting}>
             {isResetting ? (
               <>
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -85,4 +77,3 @@ export function ResetProgressDialog({ open, onOpenChange }: ResetProgressDialogP
     </Dialog>
   )
 }
-

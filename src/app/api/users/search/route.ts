@@ -14,7 +14,10 @@ export async function GET(request: NextRequest) {
     const email = searchParams.get("email")
 
     if (!email || email.length < 3) {
-      return NextResponse.json({ error: "Email search query required (min 3 characters)" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Email search query required (min 3 characters)" },
+        { status: 400 }
+      )
     }
 
     // Search for users by email (partial match)
@@ -44,4 +47,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Failed to search users" }, { status: 500 })
   }
 }
-

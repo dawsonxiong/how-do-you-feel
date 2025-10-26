@@ -1,6 +1,6 @@
 "use client"
 
-import { User, UserPlus, UserMinus, Search, Loader2 } from "lucide-react"
+import { Loader2, Search, User, UserMinus, UserPlus } from "lucide-react"
 import Image from "next/image"
 import * as React from "react"
 import { useEffect, useState } from "react"
@@ -68,7 +68,7 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query)
-    
+
     if (query.length < 3) {
       setSearchResults([])
       return
@@ -187,7 +187,7 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
               />
-              
+
               {isSearching && (
                 <div className="flex items-center justify-center py-2">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
@@ -246,9 +246,7 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-muted-foreground" />
-                <h3 className="text-sm font-medium">
-                  my connections ({uniqueConnections.length})
-                </h3>
+                <h3 className="text-sm font-medium">my connections ({uniqueConnections.length})</h3>
               </div>
 
               {uniqueConnections.length === 0 ? (
@@ -304,4 +302,3 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
     </Dialog>
   )
 }
-

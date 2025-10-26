@@ -66,6 +66,18 @@
       }
     }
   },
+  "overrides": [
+    {
+      "include": ["*.css"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noUnknownAtRules": "off"
+          }
+        }
+      }
+    }
+  ],
   "json": {
     "formatter": {
       "trailingCommas": "none"

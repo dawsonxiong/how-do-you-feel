@@ -4,6 +4,9 @@ import { LogOut, Moon, RotateCcw, Settings, Smartphone, Sun, Users } from "lucid
 import { signOut } from "next-auth/react"
 import { useTheme } from "next-themes"
 import * as React from "react"
+import { ConnectionsManager } from "@/components/ConnectionsManager"
+import { MobileSetupDialog } from "@/components/MobileSetupDialog"
+import { ResetProgressDialog } from "@/components/ResetProgressDialog"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -11,9 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu"
-import { ConnectionsManager } from "@/components/ConnectionsManager"
-import { MobileSetupDialog } from "@/components/MobileSetupDialog"
-import { ResetProgressDialog } from "@/components/ResetProgressDialog"
 
 export function SettingsButton() {
   const { theme, setTheme } = useTheme()
@@ -57,29 +57,44 @@ export function SettingsButton() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40 p-1">
-          <DropdownMenuItem onClick={() => setConnectionsOpen(true)} className="cursor-pointer py-2 px-2 flex justify-between">
+          <DropdownMenuItem
+            onClick={() => setConnectionsOpen(true)}
+            className="cursor-pointer py-2 px-2 flex justify-between"
+          >
             connections
             <Users className="h-4 w-4" />
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setMobileSetupOpen(true)} className="cursor-pointer py-2 px-2 flex justify-between">
+          <DropdownMenuItem
+            onClick={() => setMobileSetupOpen(true)}
+            className="cursor-pointer py-2 px-2 flex justify-between"
+          >
             mobile setup
             <Smartphone className="h-4 w-4" />
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleThemeToggle} className="cursor-pointer py-2 px-2 flex justify-between">
+          <DropdownMenuItem
+            onClick={handleThemeToggle}
+            className="cursor-pointer py-2 px-2 flex justify-between"
+          >
             {theme === "light" ? "dark mode" : "light mode"}
             {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setResetDialogOpen(true)} className="cursor-pointer py-2 px-2 text-destructive flex justify-between">
+          <DropdownMenuItem
+            onClick={() => setResetDialogOpen(true)}
+            className="cursor-pointer py-2 px-2 text-destructive flex justify-between"
+          >
             reset progress
             <RotateCcw className="h-4 w-4" />
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer py-2 px-2 flex justify-between">
+          <DropdownMenuItem
+            onClick={handleSignOut}
+            className="cursor-pointer py-2 px-2 flex justify-between"
+          >
             sign out
             <LogOut className="h-4 w-4" />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      
+
       <ConnectionsManager open={connectionsOpen} onOpenChange={setConnectionsOpen} />
       <MobileSetupDialog open={mobileSetupOpen} onOpenChange={setMobileSetupOpen} />
       <ResetProgressDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen} />
