@@ -259,7 +259,7 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
           <div className="h-64 flex flex-col items-center justify-center text-center">
             <Calendar className="w-12 h-12 text-muted-foreground mb-4" />
             <div className="text-muted-foreground">
-              no mood entries yet. add your first entry above to start tracking
+              no mood entries yet.
             </div>
           </div>
         </CardContent>

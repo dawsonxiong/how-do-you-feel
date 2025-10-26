@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, Copy, Eye, EyeOff, LogOut, Moon, RefreshCw, Settings, Smartphone, Sun, Users } from "lucide-react"
+import { Check, Copy, Eye, EyeOff, LogOut, Moon, RefreshCw, RotateCcw, Settings, Smartphone, Sun, Trash2, Users } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { useTheme } from "next-themes"
 import * as React from "react"
@@ -16,7 +16,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu"
 import { ConnectionsManager } from "@/components/ConnectionsManager"
@@ -30,6 +29,8 @@ export function SettingsButton() {
   const [showToken, setShowToken] = React.useState(false)
   const [copied, setCopied] = React.useState(false)
   const [regenerating, setRegenerating] = React.useState(false)
+  const [resetDialogOpen, setResetDialogOpen] = React.useState(false)
+  const [isResetting, setIsResetting] = React.useState(false)
 
   // Only render after hydration to avoid SSR issues
   React.useEffect(() => {
@@ -87,6 +88,29 @@ export function SettingsButton() {
     setTheme(theme === "light" ? "dark" : "light")
   }
 
+  const handleResetProgress = async () => {
+    setIsResetting(true)
+    try {
+      const response = await fetch("/api/mood/reset", {
+        method: "DELETE",
+      })
+      
+      if (response.ok) {
+        // Refresh the page to update the chart
+        window.location.reload()
+      } else {
+        const error = await response.json()
+        alert(error.error || "Failed to reset progress")
+      }
+    } catch (error) {
+      console.error("Error resetting progress:", error)
+      alert("Failed to reset progress")
+    } finally {
+      setIsResetting(false)
+      setResetDialogOpen(false)
+    }
+  }
+
   if (!mounted) {
     return (
       <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full mb-2">
@@ -120,6 +144,10 @@ export function SettingsButton() {
           <DropdownMenuItem onClick={handleThemeToggle} className="cursor-pointer py-2 px-2">
             {theme === "light" ? "dark mode" : "light mode"}
             {theme === "light" ? <Moon className="ml-2 h-4 w-4" /> : <Sun className="ml-2 h-4 w-4" />}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setResetDialogOpen(true)} className="cursor-pointer py-2 px-2 text-destructive">
+            reset progress
+            <RotateCcw className="ml-2 h-4 w-4" />
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer py-2 px-2">
             sign out
@@ -229,6 +257,48 @@ export function SettingsButton() {
                 </code>
               </div>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Progress Confirmation Dialog */}
+      <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-destructive" />
+              reset progress
+            </DialogTitle>
+            <DialogDescription>
+              This will permanently delete all your mood entries. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex gap-3 justify-end pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setResetDialogOpen(false)}
+              disabled={isResetting}
+            >
+              cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleResetProgress}
+              disabled={isResetting}
+            >
+              {isResetting ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  resetting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  reset all data
+                </>
+              )}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
