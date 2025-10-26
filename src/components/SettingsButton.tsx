@@ -159,7 +159,7 @@ export function SettingsButton() {
       <ConnectionsManager open={connectionsOpen} onOpenChange={setConnectionsOpen} />
       
       <Dialog open={shortcutsOpen} onOpenChange={setShortcutsOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent>
           <DialogHeader className="gap-2">
             <DialogTitle className="flex items-center gap-2">
               <Smartphone className="h-5 w-5" />
@@ -263,14 +263,14 @@ export function SettingsButton() {
 
       {/* Reset Progress Confirmation Dialog */}
       <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-        <DialogContent className="sm:max-w-[400px]">
-          <DialogHeader>
+        <DialogContent>
+          <DialogHeader className="gap-4">
             <DialogTitle className="flex items-center gap-2">
               <Trash2 className="h-5 w-5 text-destructive" />
               reset progress
             </DialogTitle>
             <DialogDescription>
-              This will permanently delete all your mood entries. This action cannot be undone.
+              this will permanently delete all your mood entries. this action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           
@@ -294,7 +294,7 @@ export function SettingsButton() {
                 </>
               ) : (
                 <>
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-4 h-4" />
                   reset all data
                 </>
               )}

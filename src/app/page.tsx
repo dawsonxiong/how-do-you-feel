@@ -24,7 +24,7 @@ export default function Home() {
           </header> */}
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch lg:mt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch mt-2 lg:mt-12">
             <MoodEntryForm onSuccess={handleMoodEntrySuccess} />
             <MoodChart refreshTrigger={refreshTrigger} />
           </div>
