@@ -19,12 +19,12 @@ const jetBrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "how do u feel?",
   description:
-    "Track your daily mood and emotions. Discover patterns in your mental wellbeing with beautiful visualizations.",
+    "enjoy",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "How Do You Feel?",
+    title: "how do u feel?",
   },
   formatDetection: {
     telephone: false,
