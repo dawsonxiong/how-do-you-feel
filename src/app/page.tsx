@@ -32,7 +32,7 @@ export default function Home() {
           {/* Footer */}
           <footer className="mt-8 flex items-center justify-between text-muted-foreground">
             <div className="flex-1" />
-            <p className="text-sm">for j</p>
+            {/* <p className="text-sm">for j</p> */}
             <div className="flex-1 flex justify-end">
               <SettingsButton />
             </div>
