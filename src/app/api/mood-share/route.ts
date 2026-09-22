@@ -90,35 +90,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Create bidirectional sharing (both users can see each other's mood)
-    await prisma.$transaction([
-      prisma.moodShare.upsert({
-        where: {
-          fromUserId_toUserId: {
-            fromUserId: session.user.id,
-            toUserId: targetUserId,
-          },
-        },
-        create: {
+    // Share my mood with them. They only see it; seeing theirs requires them to share back.
+    await prisma.moodShare.upsert({
+      where: {
+        fromUserId_toUserId: {
           fromUserId: session.user.id,
           toUserId: targetUserId,
         },
-        update: {},
-      }),
-      prisma.moodShare.upsert({
-        where: {
-          fromUserId_toUserId: {
-            fromUserId: targetUserId,
-            toUserId: session.user.id,
-          },
-        },
-        create: {
-          fromUserId: targetUserId,
-          toUserId: session.user.id,
-        },
-        update: {},
-      }),
-    ])
+      },
+      create: {
+        fromUserId: session.user.id,
+        toUserId: targetUserId,
+      },
+      update: {},
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {
@@ -141,7 +126,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Invalid target user" }, { status: 400 })
     }
 
-    // Remove bidirectional sharing
+    // Disconnect fully: stop sharing with them and stop seeing their mood
     await prisma.$transaction([
       prisma.moodShare.deleteMany({
         where: {

@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 interface Connection {
   id: string
   name: string | null
@@ -69,14 +71,14 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
   const handleSearch = async (query: string) => {
     setSearchQuery(query)
 
-    if (query.length < 3) {
+    if (!EMAIL.test(query.trim())) {
       setSearchResults([])
       return
     }
 
     setIsSearching(true)
     try {
-      const response = await fetch(`/api/users/search?email=${encodeURIComponent(query)}`)
+      const response = await fetch(`/api/users/search?email=${encodeURIComponent(query.trim())}`)
       if (response.ok) {
         const data = await response.json()
         setSearchResults(data.users)
@@ -140,11 +142,16 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
     }
   }
 
-  const isAlreadyConnected = (userId: string) => {
-    return [...viewableUsers, ...sharingWith].some((user) => user.id === userId)
+  const isSharingWith = (userId: string) => sharingWith.some((user) => user.id === userId)
+  const isViewing = (userId: string) => viewableUsers.some((user) => user.id === userId)
+
+  const connectionLabel = (userId: string) => {
+    if (isSharingWith(userId) && isViewing(userId)) return "sharing both ways"
+    if (isSharingWith(userId)) return "can see your mood"
+    return "shares their mood with you"
   }
 
-  // Get unique connections (a user can appear in both arrays with bidirectional sharing)
+  // Get unique connections (a user can appear in both arrays when sharing both ways)
   const uniqueConnections = React.useMemo(() => {
     const allConnections = [...viewableUsers, ...sharingWith]
     const seen = new Set<string>()
@@ -166,7 +173,7 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
             connections
           </DialogTitle>
           <DialogDescription className="mt-2">
-            share your mood data with friends and see theirs
+            share your mood with friends. you'll see theirs once they share back.
           </DialogDescription>
         </DialogHeader>
 
@@ -183,7 +190,8 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
                 <h3 className="text-sm font-medium">add connection</h3>
               </div>
               <Input
-                placeholder="search by email..."
+                type="email"
+                placeholder="enter their full email..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
               />
@@ -220,8 +228,8 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
                           <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                       </div>
-                      {isAlreadyConnected(user.id) ? (
-                        <span className="text-xs text-muted-foreground">connected</span>
+                      {isSharingWith(user.id) ? (
+                        <span className="text-xs text-muted-foreground">sharing</span>
                       ) : (
                         <Button
                           size="sm"
@@ -277,20 +285,40 @@ export function ConnectionsManager({ open, onOpenChange }: ConnectionsManagerPro
                         <div>
                           <p className="text-sm font-medium">{user.name || "No name"}</p>
                           <p className="text-xs text-muted-foreground">{user.email}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {connectionLabel(user.id)}
+                          </p>
                         </div>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleRemoveConnection(user.id)}
-                        disabled={isRemoving === user.id}
-                      >
-                        {isRemoving === user.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <UserMinus className="w-4 h-4" />
+                      <div className="flex items-center gap-1">
+                        {!isSharingWith(user.id) && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleAddConnection(user.id)}
+                            disabled={isAdding === user.id}
+                            title="Share your mood back"
+                          >
+                            {isAdding === user.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <UserPlus className="w-4 h-4" />
+                            )}
+                          </Button>
                         )}
-                      </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleRemoveConnection(user.id)}
+                          disabled={isRemoving === user.id}
+                        >
+                          {isRemoving === user.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <UserMinus className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>

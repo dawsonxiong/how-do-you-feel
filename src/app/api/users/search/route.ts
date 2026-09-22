@@ -3,6 +3,8 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
@@ -11,20 +13,17 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const email = searchParams.get("email")
+    const email = searchParams.get("email")?.trim()
 
-    if (!email || email.length < 3) {
-      return NextResponse.json(
-        { error: "Email search query required (min 3 characters)" },
-        { status: 400 }
-      )
+    if (!email || !EMAIL.test(email)) {
+      return NextResponse.json({ error: "A full email address is required" }, { status: 400 })
     }
 
-    // Search for users by email (partial match)
+    // Exact match only, so the user list can't be enumerated
     const users = await prisma.user.findMany({
       where: {
         email: {
-          contains: email,
+          equals: email,
           mode: "insensitive",
         },
         // Don't include the current user
@@ -38,7 +37,7 @@ export async function GET(request: NextRequest) {
         email: true,
         image: true,
       },
-      take: 10, // Limit results
+      take: 1,
     })
 
     return NextResponse.json({ users })
