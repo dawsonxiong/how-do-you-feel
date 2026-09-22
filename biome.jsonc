@@ -68,7 +68,7 @@
   },
   "overrides": [
     {
-      "include": ["*.css"],
+      "includes": ["**/*.css"],
       "linter": {
         "rules": {
           "suspicious": {

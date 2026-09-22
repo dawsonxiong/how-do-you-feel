@@ -19,8 +19,7 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "how do u feel?",
-  description:
-    "enjoy",
+  description: "enjoy",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
