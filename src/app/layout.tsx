@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
+import { auth } from "@/auth"
 import { AuthProvider } from "@/components/AuthProvider"
 import { ThemeProvider } from "@/components/ThemeProvider"
 
@@ -41,11 +42,13 @@ export const viewport = {
   ],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const session = await auth()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetBrainsMono.variable} font-sans antialiased`}>
@@ -55,7 +58,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider session={session}>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>
