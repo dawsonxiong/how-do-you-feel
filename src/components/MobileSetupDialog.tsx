@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, Copy, Eye, EyeOff, ExternalLink, Play, RefreshCw, Smartphone } from "lucide-react"
+import { Check, Copy, ExternalLink, Eye, EyeOff, Play, RefreshCw, Smartphone } from "lucide-react"
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -51,7 +51,8 @@ export function MobileSetupDialog({ open, onOpenChange }: MobileSetupDialogProps
 
   const handleCopyUrl = async () => {
     if (apiToken && typeof window !== "undefined") {
-      const url = `${window.location.origin}/api/shortcuts/submit?token=${apiToken}&rating=`
+      const timeZone = encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)
+      const url = `${window.location.origin}/api/shortcuts/submit?token=${apiToken}&tz=${timeZone}&rating=`
       await navigator.clipboard.writeText(url)
       setUrlCopied(true)
       setTimeout(() => setUrlCopied(false), 2000)
@@ -170,8 +171,8 @@ export function MobileSetupDialog({ open, onOpenChange }: MobileSetupDialogProps
                   <div className="bg-muted p-2 rounded-md relative">
                     <code className="text-xs break-all block pr-8">
                       {typeof window !== "undefined"
-                        ? `${window.location.origin}/api/shortcuts/submit?token=YOUR_TOKEN&rating=`
-                        : "/api/shortcuts/submit?token=YOUR_TOKEN&rating="}
+                        ? `${window.location.origin}/api/shortcuts/submit?token=YOUR_TOKEN&tz=YOUR_TIMEZONE&rating=`
+                        : "/api/shortcuts/submit?token=YOUR_TOKEN&tz=YOUR_TIMEZONE&rating="}
                     </code>
                     <Button
                       variant="ghost"

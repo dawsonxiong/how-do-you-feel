@@ -1,46 +1,13 @@
 import { formatDistanceToNow } from "date-fns"
-import { NextResponse } from "next/server"
+import { getUserFromApiToken } from "@/lib/api-token"
+import { getMoodLabel } from "@/lib/mood"
 import { prisma } from "@/lib/prisma"
-
-const moodLabels: Record<number, string> = {
-  0: "terrible",
-  1: "very sad",
-  2: "sad",
-  3: "down",
-  4: "low",
-  5: "neutral",
-  6: "okay",
-  7: "good",
-  8: "happy",
-  9: "great",
-  10: "amazing!",
-}
-
-function getMoodLabel(rating: number): string {
-  const rounded = Math.round(rating)
-  return moodLabels[rounded] || "neutral"
-}
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const token = searchParams.get("token")
-
-    if (!token) {
-      return new Response("Missing API token. Add ?token=YOUR_TOKEN to the URL.", {
-        status: 401,
-        headers: { "Content-Type": "text/plain" },
-      })
-    }
-
-    // Find user by API token
-    const user = await prisma.user.findUnique({
-      where: { apiToken: token },
-      select: { id: true, name: true },
-    })
-
+    const user = await getUserFromApiToken(request)
     if (!user) {
-      return new Response("Invalid API token.", {
+      return new Response("Missing or invalid API token.", {
         status: 401,
         headers: { "Content-Type": "text/plain" },
       })
@@ -49,7 +16,7 @@ export async function GET(request: Request) {
     // Get latest mood entry
     const latestEntry = await prisma.moodEntry.findFirst({
       where: { userId: user.id },
-      orderBy: { date: "desc" },
+      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       select: {
         rating: true,
         date: true,
