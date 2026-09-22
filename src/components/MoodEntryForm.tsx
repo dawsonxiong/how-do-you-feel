@@ -1,5 +1,6 @@
 "use client"
 
+import { format } from "date-fns"
 import { Check, Heart } from "lucide-react"
 import { useId, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -46,6 +47,7 @@ export function MoodEntryForm({ onSuccess }: MoodEntryFormProps) {
         },
         body: JSON.stringify({
           rating: rating[0],
+          date: format(new Date(), "yyyy-MM-dd"),
           tags: tags.trim() || null,
           notes: notes.trim() || null,
         }),

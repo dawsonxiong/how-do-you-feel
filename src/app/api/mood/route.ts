@@ -1,7 +1,7 @@
-import { format, startOfDay } from "date-fns"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
+import { dateKey, toEntryDate } from "@/lib/dates"
 import { prisma } from "@/lib/prisma"
 
 export async function POST(request: NextRequest) {
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { rating, tags, notes } = await request.json()
+    const { rating, tags, notes, date: localDate } = await request.json()
 
     if (typeof rating !== "number" || rating < 0 || rating > 10) {
       return NextResponse.json(
@@ -21,14 +21,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Set the date to today at midnight for consistency
-    const today = startOfDay(new Date())
+    // The client sends its local calendar day (yyyy-MM-dd)
+    const date = toEntryDate(localDate)
+    if (!date) {
+      return NextResponse.json({ error: "Date must be yyyy-MM-dd" }, { status: 400 })
+    }
 
     const moodEntry = await prisma.moodEntry.create({
       data: {
         userId: session.user.id,
         rating,
-        date: today,
+        date,
         tags: tags || null,
         notes: notes || null,
       },
@@ -55,7 +58,6 @@ export async function GET() {
         toUserId: session.user.id,
       },
       select: {
-        fromUserId: true,
         fromUser: {
           select: {
             id: true,
@@ -67,160 +69,51 @@ export async function GET() {
       },
     })
 
-    const sharedUserIds = sharedUsers.map((share) => share.fromUserId)
-    const allUserIds = [session.user.id, ...sharedUserIds]
+    const allUserIds = [session.user.id, ...sharedUsers.map((share) => share.fromUser.id)]
 
-    // Get mood entries for the authenticated user AND users sharing with them
+    // Only the fields the chart plots: notes and tags stay private to their owner
     const moodEntries = await prisma.moodEntry.findMany({
       where: {
         userId: {
           in: allUserIds,
         },
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-          },
-        },
+      select: {
+        userId: true,
+        rating: true,
+        date: true,
       },
       orderBy: {
         date: "asc",
       },
     })
 
-    // Group by date AND user, then calculate daily averages per user
-    interface UserDayData {
-      date: string
-      users: Record<
-        string,
-        {
-          userId: string
-          userName: string | null
-          userImage: string | null
-          ratings: number[]
-          entries: Array<{
-            id: string
-            rating: number
-            date: Date
-            tags: string | null
-            notes: string | null
-            createdAt: Date
-            updatedAt: Date
-          }>
-        }
-      >
+    // Average each user's ratings per day
+    const days = new Map<string, Map<string, number[]>>()
+
+    for (const entry of moodEntries) {
+      const key = dateKey(entry.date)
+      const users = days.get(key) ?? new Map<string, number[]>()
+      const ratings = users.get(entry.userId) ?? []
+      ratings.push(entry.rating)
+      users.set(entry.userId, ratings)
+      days.set(key, users)
     }
 
-    const dailyData = moodEntries.reduce(
-      (acc: Record<string, UserDayData>, entry: (typeof moodEntries)[0]) => {
-        const dateKey = format(entry.date, "yyyy-MM-dd")
-
-        if (!acc[dateKey]) {
-          acc[dateKey] = {
-            date: dateKey,
-            users: {},
-          }
-        }
-
-        if (!acc[dateKey].users[entry.userId]) {
-          acc[dateKey].users[entry.userId] = {
-            userId: entry.userId,
-            userName: entry.user.name,
-            userImage: entry.user.image,
-            ratings: [],
-            entries: [],
-          }
-        }
-
-        acc[dateKey].users[entry.userId].ratings.push(entry.rating)
-        acc[dateKey].users[entry.userId].entries.push({
-          id: entry.id,
-          rating: entry.rating,
-          date: entry.date,
-          tags: entry.tags,
-          notes: entry.notes,
-          createdAt: entry.createdAt,
-          updatedAt: entry.updatedAt,
-        })
-
-        return acc
-      },
-      {} as Record<string, UserDayData>
-    )
-
-    // Calculate averages for days with data, organized by user
-    const dayData = (Object.values(dailyData) as UserDayData[]).map((day) => {
-      const userDataArray = Object.values(day.users).map((userData) => ({
-        userId: userData.userId,
-        userName: userData.userName,
-        userImage: userData.userImage,
-        rating:
-          Math.round(
-            (userData.ratings.reduce((sum: number, r: number) => sum + r, 0) /
-              userData.ratings.length) *
-              100
-          ) / 100,
-        entryCount: userData.entries.length,
-        entries: userData.entries,
-      }))
-
-      return {
-        date: day.date,
-        users: userDataArray,
-      }
-    })
-
-    // Create continuous time series based on actual data range
-    let startDate: Date
-    let endDate: Date
-
-    if (dayData.length > 0) {
-      // Use actual data range with some padding
-      const dates = dayData.map((d) => new Date(d.date)).sort((a, b) => a.getTime() - b.getTime())
-      startDate = new Date(dates[0])
-      endDate = new Date(dates[dates.length - 1])
-
-      // Add padding: 7 days before first entry, 3 days after last entry
-      startDate.setDate(startDate.getDate() - 7)
-      endDate.setDate(endDate.getDate() + 3)
-
-      // But limit maximum range to 90 days to avoid chart performance issues
-      const maxDays = 90
-      const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-
-      if (daysDiff > maxDays) {
-        // Show last 90 days of the data range
-        startDate = new Date(endDate)
-        startDate.setDate(endDate.getDate() - maxDays)
-      }
-    } else {
-      // Fallback to last 30 days if no data
-      endDate = new Date()
-      startDate = new Date()
-      startDate.setDate(endDate.getDate() - 30)
-    }
-
-    // Sort by date and return with metadata
-    const sortedData = dayData.sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    )
-
-    // Get user info for all shared users
-    const sharedUsersInfo = sharedUsers.map((share) => ({
-      id: share.fromUser.id,
-      name: share.fromUser.name,
-      email: share.fromUser.email,
-      image: share.fromUser.image,
+    // Entries are ordered by date, so the map is already in date order
+    const data = [...days].map(([date, users]) => ({
+      date,
+      users: [...users].map(([userId, ratings]) => ({
+        userId,
+        rating: Math.round((ratings.reduce((sum, r) => sum + r, 0) / ratings.length) * 100) / 100,
+        entryCount: ratings.length,
+      })),
     }))
 
     return NextResponse.json({
-      data: sortedData,
+      data,
       currentUserId: session.user.id,
-      sharedUsers: sharedUsersInfo,
+      sharedUsers: sharedUsers.map((share) => share.fromUser),
     })
   } catch (error) {
     console.error("Error fetching mood entries:", error)

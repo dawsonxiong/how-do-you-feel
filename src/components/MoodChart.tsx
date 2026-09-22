@@ -13,23 +13,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface UserMoodEntry {
   userId: string
-  userName: string | null
-  userImage: string | null
   rating: number
   entryCount: number
-  entries: Array<{
-    id: string
-    rating: number
-    date: Date
-    tags: string | null
-    notes: string | null
-    createdAt: Date
-    updatedAt: Date
-  }>
 }
 
 interface DayData {
@@ -106,26 +96,28 @@ const CustomTooltip = ({
 export function MoodChart({ refreshTrigger }: MoodChartProps) {
   const [moodData, setMoodData] = useState<MoodData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [visibleUsers, setVisibleUsers] = useState<Set<string>>(new Set())
   const { theme } = useTheme()
 
   const fetchMoodData = async () => {
+    setHasError(false)
     try {
-      const response = await fetch("/api/mood")
-      if (response.ok) {
-        const data: MoodData = await response.json()
-        setMoodData(data)
+      const response = await fetch("/api/mood", { signal: AbortSignal.timeout(15_000) })
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+      const data: MoodData = await response.json()
+      setMoodData(data)
 
-        // Initialize all users as visible
-        const allUserIds = new Set<string>([data.currentUserId])
-        for (const user of data.sharedUsers) {
-          allUserIds.add(user.id)
-        }
-        setVisibleUsers(allUserIds)
+      // Initialize all users as visible
+      const allUserIds = new Set<string>([data.currentUserId])
+      for (const user of data.sharedUsers) {
+        allUserIds.add(user.id)
       }
+      setVisibleUsers(allUserIds)
     } catch (error) {
       console.error("Error fetching mood data:", error)
+      setHasError(true)
     } finally {
       setIsLoading(false)
     }
@@ -245,6 +237,34 @@ export function MoodChart({ refreshTrigger }: MoodChartProps) {
         <CardContent>
           <div className="h-64 flex items-center justify-center">
             <div className="text-muted-foreground">loading...</div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (hasError && !moodData) {
+    return (
+      <Card className="w-full h-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <TrendingUp className="w-5 h-5" />
+            history
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64 flex flex-col items-center justify-center gap-3 text-center">
+            <div className="text-muted-foreground">couldn't load your history.</div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsLoading(true)
+                fetchMoodData()
+              }}
+            >
+              try again
+            </Button>
           </div>
         </CardContent>
       </Card>
