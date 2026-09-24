@@ -1,6 +1,6 @@
 # how do you feel?
 
-A daily mood tracker you can share. Friends who share their history show up as extra lines on your chart.
+A daily mood tracker you can share with friends. If someone shares their moods with you, they show up as another line on your chart.
 
 Live at [how-do-you-feel.vercel.app](https://how-do-you-feel.vercel.app).
 
@@ -8,11 +8,11 @@ Live at [how-do-you-feel.vercel.app](https://how-do-you-feel.vercel.app).
 
 ## Features
 
-- Log a mood from 0 to 10 each day, with tags and a note.
-- A history chart of your moods, with a line for each friend who shares with you.
-- Sharing is one-directional and per person: find someone by exact email and choose who sees yours.
-- Log from an iOS Shortcut without opening the app.
-- Light and dark mode.
+- Rate your mood from 0 to 10 each day and add tags or a note
+- See your history on a chart, along with anyone who shares with you
+- Add friends by email and choose who can see your moods. Sharing goes one way, so you can follow someone without them following you
+- Log a mood from an iOS Shortcut without opening the app
+- Dark mode
 
 ## Screenshots
 
@@ -26,7 +26,7 @@ Next.js 15, React 19, TypeScript, Prisma 6, Postgres, Auth.js, Google OAuth, Rec
 
 ## Running locally
 
-Requires Node 22, pnpm, a Postgres database and a Google OAuth client. Put these in `.env`:
+You'll need Node 22, pnpm, a Postgres database and a Google OAuth client. Add these to `.env`:
 
 ```sh
 DATABASE_URL=
@@ -42,16 +42,16 @@ pnpm prisma:migrate
 pnpm dev
 ```
 
-`pnpm seed` fills the database with sample moods. Other scripts: `pnpm lint`, `pnpm format`, `pnpm typecheck`, `pnpm build`.
+Run `pnpm seed` if you want some sample moods to look at. Other scripts: `pnpm lint`, `pnpm format`, `pnpm typecheck`, `pnpm build`.
 
 ## iOS Shortcut
 
-The settings menu walks you through adding the app to your home screen and building a Shortcut around your personal API token. The Shortcut posts to `/api/shortcuts/submit` with the token as `Authorization: Bearer <token>`:
+Settings has a guide for adding the app to your home screen and setting up a Shortcut. It gives you an API token, and the Shortcut sends a request like this with `Authorization: Bearer <token>`:
 
 ```
 POST /api/shortcuts/submit?rating=7.5&tags=work,tired&notes=long%20day
 ```
 
-`date` and `tz` are optional, for logging a day other than today.
+You can also pass `date` and `tz` to log a different day.
 
 <img src="docs/screenshots/mobile-setup.webp" alt="Shortcuts and homescreen setup dialog with steps for adding the app to the home screen and building an iOS Shortcut around the submit URL" width="360">
